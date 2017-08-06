@@ -4,7 +4,7 @@ These are a list of objectives, tests to resolution, and date resolved.
 	+ Store pre-programmed moves and how to activate.
 	+ Be able to activate said moves.
 	+ Activate moves in non-instant loop.
-	+ End program loop upon keypress('q').
+	+ End program loop upon keypress('Esc').
 
 2) Determine hp/% of the target, and heal only when target is a certain % down.	(Functioning Macro)
 	+ Grab image of target's hp:
