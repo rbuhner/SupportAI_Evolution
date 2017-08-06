@@ -5,6 +5,8 @@ These are a list of objectives, tests to resolution, and date resolved.
 	+ Be able to activate said moves.
 	+ Activate moves in non-instant loop.
 	+ End program loop upon keypress('Esc').
+	
+	Encoded but untested on 08/06/2017
 
 2) Determine hp/% of the target, and heal only when target is a certain % down.	(Functioning Macro)
 	+ Grab image of target's hp:
