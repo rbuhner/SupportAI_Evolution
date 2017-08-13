@@ -5,6 +5,7 @@
  */
 package supportai_evolution;
 
+import java.awt.Color;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
 
@@ -69,5 +70,14 @@ public class SAIE_Util {
             case ' ':return KeyEvent.VK_SPACE;
         }
         return KeyEvent.CHAR_UNDEFINED; //If the char in doesn't correspond.
+    }
+    
+    static Color PixeltoColor(int pixel){
+        int alpha=(pixel>>24)&0xff;
+        int red=(pixel>>16)&0xff;
+        int green=(pixel>>8)&0xff;
+        int blue=(pixel)&0xff;
+        
+        return new Color(red,green,blue,alpha);
     }
 }

@@ -7,7 +7,8 @@ package supportai_evolution;
 
 /**
  *  This is an evolving compilation of research and work to create a (hopefully) self-sufficient MMO Support AI, SAI-E
- *  (Stage 1) Theoretically finished 08/06/2017
+ *  (Stage 1) First Activation Loops: Theoretically finished 08/06/2017
+ *  (Stage 2) EyesOpen~Smart Healing: Conversion In-Progress
  * @author Robert
  */
 
@@ -20,6 +21,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+import java.util.ArrayList;
 
 //For the global keyboard listening. All this to capture a 'Esc' press to quit...
 import org.jnativehook.GlobalScreen;
@@ -32,11 +34,15 @@ import java.util.logging.Level;
 public class SupportAI_Evolution {
     private static SupportAI_Evolution my;  //Need to make this non-static somehow, so that each run can target a new simulation with a new AI...
     private static GlobalKeyListener gkl;
+    private static String filePath="";
+    private ArrayList<String> savedArgs[]=new ArrayList[]{new ArrayList<>(),new ArrayList<>()};
     
     protected boolean q;
+    private final static boolean setup=false;
     private byte errorLevel;
     
     private SAIE_Skill skillBar[];
+    private SAIE_Target currentTarget;
     
     /**
      * @param args the command line arguments
@@ -47,6 +53,14 @@ public class SupportAI_Evolution {
         my.q=true;   //Turn to false when ready to run.
         my.errorLevel=0;
         
+        //This is currently going to assume that the filepath/skill(s)/target(s) given is a valid one,
+        //  until a later time when implementing more file-utils/error checking.
+        for(int i=0;i<args.length;i++){
+            if(args[i].equals("-fp")&&i+1<args.length){filePath=args[i+1];}                     //FilePath
+            else if(args[i].equals("-t")&&i+1<args.length){my.savedArgs[0].add(args[i+1]);}     //Target(s)
+            else if(args[i].equals("-s")&&i+1<args.length){my.savedArgs[1].add(args[i+1]);}     //Skills(s)
+        }
+        
         //Sleeping for 5 sec to switch over to simulation.
         try{Thread.sleep(5000);}
         catch(InterruptedException e){
@@ -54,16 +68,16 @@ public class SupportAI_Evolution {
             my.errorLevel++;
         }
         
-        my.init();
+        my.SAIE_Initialize();
         if(my.q==true){
             System.out.println("Need to terminate from init(). Exiting...");
-            my.cleanExit();
+            my.cleanExit(1);
         }
         
         //Attempting to time AI process loop to once every second first.
         int temp=10;
         do{
-            try{Thread.sleep(500);} //
+            try{Thread.sleep(500);}
             catch(InterruptedException e){
                 System.out.println("Something interrupted thread sleep.");
                 my.errorLevel++;
@@ -78,10 +92,10 @@ public class SupportAI_Evolution {
         }while(!my.q&&temp-->0);
         
         //Cleanup at the end of the program.
-        my.cleanExit();
+        my.cleanExit(0);
     }
     
-    private void init(){
+    private void SAIE_Initialize(){
         //Defines AI's 'robot' (human image computer interface)
         System.out.println("Creating Robot...");
         try{SAIE_Util.r=new Robot();}
@@ -116,9 +130,85 @@ public class SupportAI_Evolution {
         System.out.println("Native hook registered. Now listening for 'Esc'.");
         
         /* Profile Loading */
-        skillBar = new SAIE_Skill[]{
-            new SAIE_Skill("Generic Heal",SAIE_Skill.skillType.heal,'5')
-        };
+        //Looks like I'm doing basic profile loading a bit early this time.
+        if(!savedArgs[0].isEmpty()){    //Only taking the first target for now, but will upgrade later.
+            //String name,Rectangle xyhp,Color chp,int chpIDev
+            String temp="",name="";
+            int xyhp[]=new int[4];
+            byte chp[]=new byte[3];
+            int chpDev=-1;
+            byte step=0;
+            
+            //name:xyhpx:xyhpy:xyhpw:xyhph:chpr:chpg:chpb:chpDev:
+            //~any~:####:####:####:####:###:###:###:###:
+            for(int i=0;i<savedArgs[0].get(0).length();i++){
+                if(savedArgs[0].get(0).charAt(i)==':'){
+                    switch(step){
+                        case 0: name=temp; break;
+                        case 1:
+                        case 2: //Hp Rectangle area
+                        case 3:
+                        case 4: xyhp[step-1]=Integer.parseInt(temp); break;
+                        case 5:
+                        case 6: //Avg Hp Color area
+                        case 7: chp[step-5]=Byte.parseByte(temp); break;
+                        case 8: chpDev=Integer.parseInt(temp);
+                    }
+                    step++;
+                    temp="";
+                }else{temp+=savedArgs[0].get(0).length();}
+            }
+            currentTarget=new SAIE_Target(name,new Rectangle(xyhp[0],xyhp[1],xyhp[2],xyhp[3]),new Color(chp[0],chp[1],chp[2]),chpDev);
+        }else{
+            System.err.println("Target not provided. Please give a target on next run. Exiting...");
+            cleanExit(1);
+        }
+        
+        if(!savedArgs[1].isEmpty()){    //Just dealing with one skill at the moment, until profile loading is done. Would hate to input so many cmd'd...
+            //String name,skillType sType,char key
+            String temp="",name="",type="";
+            char key='-';
+            byte step=0;
+            
+            //name:type:key:     ~any~:~any~:¢:
+            for(int i=0;i<savedArgs[1].get(0).length();i++){
+                if(savedArgs[1].get(0).charAt(i)==':'){
+                    switch(step){
+                        case 0: name=temp; break;
+                        case 1: type=temp; break;
+                        case 2: key=temp.charAt(0);
+                    }
+                    step++;
+                    temp="";
+                }else{temp+=savedArgs[1].get(0).charAt(i);}
+            }
+            
+            skillBar = new SAIE_Skill[]{
+                new SAIE_Skill(name,SAIE_Skill.skillType.valueOf(type),key)
+            };
+        }else{
+            System.err.println("Skills not provided. Please give valid skills on next run. Exiting...");
+            cleanExit(1);
+        }
+    }
+    
+    private void SAIE_OpenEyes(){   //Might need to rearrange later for OpenEyes to be viable still, maybe once SAI-E's not so vision-only.
+        //--Run once for manual values
+        if(setup){
+            my.q=true;
+            try{
+                System.out.println("Capturing Screen...");
+                BufferedImage scap = SAIE_Util.r.createScreenCapture(new Rectangle(
+                        Toolkit.getDefaultToolkit().getScreenSize()));
+                File sfile = new File(filePath+"screencapInit.jpg");
+                ImageIO.write(scap,"jpg",sfile);
+                System.out.println("Screen captured and saved at "+filePath+"screencapInit.jpg");
+                cleanExit(0);
+            }catch(IOException e){
+                System.out.println("Unable image to write to file. Exiting...");
+                cleanExit(1);
+            }
+        }
     }
     
     /** Where SAI-E processes choices and skill usage. */
@@ -129,7 +219,7 @@ public class SupportAI_Evolution {
         skillBar[0].use();
     }
     
-    private void cleanExit(){
+    private void cleanExit(int exitcode){
         //Cleaning up keyboard hook.
         System.out.println("Clearing native key hook post-program.");
         SupportAI_Evolution.gkl.deleteSelf();
@@ -137,7 +227,7 @@ public class SupportAI_Evolution {
         
         System.out.println("\nProgram has ended.\n");
         
-        System.exit(0);
+        System.exit(exitcode);
     }
 }
 

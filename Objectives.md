@@ -21,9 +21,30 @@ These are a list of objectives, tests to resolution, and date resolved.
 	+ Check for no health, to terminate program {targetIsDead=true;}.
 	+ Tie activated moves into hp% system to avoid healing dead or healthy targets.
 
+	Notes for later: check around health bar for similar-colored pixels,
+		to rule out environmental errors.
+
 3) Switch between self and target(s).	(Self-Healing Macro)
 	+ Storing of hotkeys for selecting self and party target(s).
 	+ Grab and check hp of both self and any available party targets to initial images thereof.
 	+ Check self health for no hp {my.self.isDead=true;}.
 	+ Add cooldown counting so it doesn't spam the skill too much.
 	+ Add target names for better code/output notes.
+
+4) Creating, saving, and loading game profiles.		(Starts remembering, paving towards optimization.)
+	+ File creation, loading, and updating, with error checking.
+	+ Creation of game profile file if not previously created, update thereafter.
+	  |~ Similar needs of 1st/Over-shoulder MMORPG games: Character Name, HPBar(s), MPBar(s),
+	    Skillbar(s), any party members, any guild/alliance/friend members if needed.
+	+ Standardized and/or evolving (later) profiles, to work with multiple games.
+
+
+Assumptions at this level (Stage 2):
+	~ Target needs to be part of their party.
+	~ Target needs to remain within range of healing skill.
+	- Skillset is hard-coded to AI.
+	+ Thanks to command-line args, both target and skills are given upon program startup.
+	+ Healing rate is based off target being injured.
+	~ All skill usage is done via typed instead of clicked actions.
+	+ Target's health bar will not change position, nor color within normal deviation.
+	+ If no target in the first party slot, the first target is assumed dead/MIA.
