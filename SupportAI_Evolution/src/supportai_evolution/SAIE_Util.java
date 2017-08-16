@@ -72,6 +72,21 @@ public class SAIE_Util {
         return KeyEvent.CHAR_UNDEFINED; //If the char in doesn't correspond.
     }
     
+    /**
+     * What would essentially be a multi-typed array to return from some Util color functions.
+     * Currently contains a Color and an int (int usually being the difference of some Color from another.)
+     */
+    static class ColorUtilReturn{
+        public final Color color;
+        public final int number;
+        
+        public ColorUtilReturn(Color c,int n){
+            color=c;
+            number=n;
+        }
+    }
+    
+    /** To interchange pixel int-colors to a more usable Color format. */
     static Color PixeltoColor(int pixel){
         int alpha=(pixel>>24)&0xff;
         int red=(pixel>>16)&0xff;
@@ -80,4 +95,25 @@ public class SAIE_Util {
         
         return new Color(red,green,blue,alpha);
     }
+    /** Used to determine what 'family' of colors the color is in, may upgrade so one can choose the pallete. */
+    static ColorUtilReturn ClosestColor(Color c){
+        int t=765;  //Max difference that can occur between two colors.
+        Color cout=null;
+        
+        //Temp version, need to think of a better way...
+        if(Math.abs(colorDif(Color.WHITE,c))<t){cout=Color.WHITE; t=Math.abs(colorDif(Color.WHITE,c));}
+        if(Math.abs(colorDif(Color.RED,c))<t){cout=Color.RED; t=Math.abs(colorDif(Color.RED,c));}
+        if(Math.abs(colorDif(Color.GREEN,c))<t){cout=Color.GREEN; t=Math.abs(colorDif(Color.GREEN,c));}
+        if(Math.abs(colorDif(Color.BLUE,c))<t){cout=Color.BLUE; t=Math.abs(colorDif(Color.BLUE,c));}
+        if(Math.abs(colorDif(Color.BLACK,c))<t){cout=Color.BLACK; t=Math.abs(colorDif(Color.BLACK,c));}
+        
+        return new ColorUtilReturn(cout,t);
+    }
+    /**
+     * Returns the difference between two colors, using the positive/negative to denote brighter or darker difference.
+     * @param a Origin Color to compare to
+     * @param b Comparing Color
+     * @return The amount that Color b is different from Color a, positive if brighter, negative if darker.
+     */
+    static int colorDif(Color a,Color b){return (a.getRed()-b.getRed())+(a.getGreen()-b.getGreen())+(a.getBlue()-b.getBlue());}
 }
