@@ -13,16 +13,17 @@ These are a list of objectives, tests to resolution, and date resolved.
 		+ Get image from hardcoded rectangle.
 		+ Get color from collected avg of pixel color in rectangle.
 		+ Identify color (red, green, purple, etc.), and avg variance from identified color.
-		+ 'Blank' out non-color pixels via rectangle array. If two rectangles touch, join them.
-		+ Simplify masked rectangle to a continguous int[] or int[][] (array of x points on line y,
+		+ Simplify rectangle to a continguous int or int[] (array of x points on line y,
 			or array of x points across varying y).
-		+ Scan rectangle for contiguous int[]/[] of valid pixels.
+		+ Scan rectangle for contiguous int([]) of valid pixels.
 	+ Check difference in target hp to full hp.
 	+ Check for no health, to terminate program {targetIsDead=true;}.
 	+ Tie activated moves into hp% system to avoid healing dead or healthy targets.
 
 	Notes for later: check around health bar for similar-colored pixels,
 		to rule out environmental errors.
+
+	Encoded but untested on 08/17/2017
 
 3) Switch between self and target(s).	(Self-Healing Macro)
 	+ Storing of hotkeys for selecting self and party target(s).
