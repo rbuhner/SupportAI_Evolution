@@ -158,7 +158,8 @@ public class SupportAI_Evolution {
                     temp="";
                 }else{temp+=savedArgs[0].get(0).length();}
             }
-            currentTarget=new SAIE_Target(name,new Rectangle(xyhp[0],xyhp[1],xyhp[2],xyhp[3]),new Color(chp[0],chp[1],chp[2]),chpDev);
+            try{currentTarget=new SAIE_Target(name,new Rectangle(xyhp[0],xyhp[1],xyhp[2],xyhp[3]),new Color(chp[0],chp[1],chp[2]),chpDev,true);}
+            catch(SAIE_Util.InvalidValueException e){cleanExit(1);}
         }else{
             System.err.println("Target not provided. Please give a target on next run. Exiting...");
             cleanExit(1);
@@ -213,10 +214,15 @@ public class SupportAI_Evolution {
     
     /** Where SAI-E processes choices and skill usage. */
     private void SAIECore(){    //Probably will be broken up as reasoning logic gets over-large.
-        /* (Stage 1) Spams a single known heal. */
+        /* (Stage 2) Starts to look at the target's hp before using the skill. */
         
-        System.out.println("Attempting "+skillBar[0].getName()+" skill use on target.");
-        skillBar[0].use();
+        float hptarget = 0.75F;
+        
+        System.out.println("Target "+currentTarget.getName()+"'s hp is currently "+currentTarget.getHp()+"%.");
+        if(currentTarget.getHp()<hptarget){
+            System.out.println("Attempting "+skillBar[0].getName()+" skill use on target.");
+            skillBar[0].use();
+        }
     }
     
     private void cleanExit(int exitcode){

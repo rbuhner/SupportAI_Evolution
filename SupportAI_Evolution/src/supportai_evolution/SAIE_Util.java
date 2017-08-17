@@ -14,6 +14,10 @@ import java.awt.event.KeyEvent;
  * @author Robert
  */
 public class SAIE_Util {
+    static class InvalidValueException extends Exception{
+        //Will update with more data as neccissary.
+    }
+    
     static Robot r;
     
     /** Presses and releases a given integer keyboard key. */
@@ -95,7 +99,10 @@ public class SAIE_Util {
         
         return new Color(red,green,blue,alpha);
     }
-    /** Used to determine what 'family' of colors the color is in, may upgrade so one can choose the pallete. */
+    /** Used to determine what 'family' of colors the color is in, may upgrade so one can choose the pallete. 
+     * @param c Color to determine the color family of.
+     * @return A ColorUtilReturn composed of the color family and shades away from it the given color is.
+     */
     static ColorUtilReturn ClosestColor(Color c){
         int t=765;  //Max difference that can occur between two colors.
         Color cout=null;
