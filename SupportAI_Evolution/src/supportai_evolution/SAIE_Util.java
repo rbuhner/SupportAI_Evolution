@@ -8,6 +8,7 @@ package supportai_evolution;
 import java.awt.Color;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
 
 /**
  *  SAI-E's interface with the system.
@@ -123,4 +124,17 @@ public class SAIE_Util {
      * @return The amount that Color b is different from Color a, positive if brighter, negative if darker.
      */
     static int colorDif(Color a,Color b){return (a.getRed()-b.getRed())+(a.getGreen()-b.getGreen())+(a.getBlue()-b.getBlue());}
+    static boolean cWithinDev(Color a,int b,int dev){return Math.abs(colorDif(a,PixeltoColor(b)))<=dev;}
+    static boolean cWithinDev(Color a[],int b,int dev[]){
+        for(int i=0;i<a.length;i++){
+            if(Math.abs(colorDif(a[i],PixeltoColor(b)))<=dev[i]){return true;}
+        }
+        return false;
+    }
+    static Color[] ByteArrayToColorArray(ArrayList<byte[]> in){
+        Color colout[]=new Color[in.size()];
+        for(int i=0;i<in.size();i++){colout[i]=new Color(in.get(i)[0],in.get(i)[1],in.get(i)[2]);}
+        
+        return colout;
+    }
 }

@@ -13,7 +13,6 @@ package supportai_evolution;
  */
 
 import java.awt.AWTException;
-import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.Toolkit;
@@ -22,6 +21,7 @@ import java.io.*;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 //For the global keyboard listening. All this to capture a 'Esc' press to quit...
 import org.jnativehook.GlobalScreen;
@@ -38,7 +38,7 @@ public class SupportAI_Evolution {
     private ArrayList<String> savedArgs[]=new ArrayList[]{new ArrayList<>(),new ArrayList<>()};
     
     protected boolean q;
-    private final static boolean setup=false;
+    private final static boolean setup=true;
     private byte errorLevel;
     
     private SAIE_Skill skillBar[];
@@ -67,6 +67,8 @@ public class SupportAI_Evolution {
             System.out.println("Something interrupted thread sleep.");
             my.errorLevel++;
         }
+        
+        my.SAIE_OpenEyes();
         
         my.SAIE_Initialize();
         if(my.q==true){
@@ -135,12 +137,13 @@ public class SupportAI_Evolution {
             //String name,Rectangle xyhp,Color chp,int chpIDev
             String temp="",name="";
             int xyhp[]=new int[4];
-            byte chp[]=new byte[3];
-            int chpDev=-1;
+            ArrayList<byte[]> chp=new ArrayList<>();
+            ArrayList<Integer> chpDev=new ArrayList<>();
             byte step=0;
+            byte n=-1,nc=-1;
             
-            //name:xyhpx:xyhpy:xyhpw:xyhph:chpr:chpg:chpb:chpDev:
-            //~any~:####:####:####:####:###:###:###:###:
+            //name:xyhpx:xyhpy:xyhpw:xyhph:chpn:chpr:chpg:chpb:||:chpDev:||:
+            //~any~:####:####:####:####:#:###:###:###:||:###:||:
             for(int i=0;i<savedArgs[0].get(0).length();i++){
                 if(savedArgs[0].get(0).charAt(i)==':'){
                     switch(step){
@@ -149,16 +152,26 @@ public class SupportAI_Evolution {
                         case 2: //Hp Rectangle area
                         case 3:
                         case 4: xyhp[step-1]=Integer.parseInt(temp); break;
-                        case 5:
-                        case 6: //Avg Hp Color area
-                        case 7: chp[step-5]=Byte.parseByte(temp); break;
-                        case 8: chpDev=Integer.parseInt(temp);
+                        case 5: n=Byte.parseByte(temp); nc=n; break;
+                        case 6: chp.add(new byte[3]);
+                        case 7: chp.get(n-nc)[step-6]=Byte.parseByte(temp); break;
+                        case 8: chp.get(n-nc)[3]=Byte.parseByte(temp);
+                                if(nc>0){nc--; step=5;}
+                                else{nc=n;}
+                                break;
+                        case 9: chpDev.add(Integer.parseInt(temp));
+                                if(nc>0){nc--; step=8;}
                     }
                     step++;
                     temp="";
                 }else{temp+=savedArgs[0].get(0).length();}
             }
-            try{currentTarget=new SAIE_Target(name,new Rectangle(xyhp[0],xyhp[1],xyhp[2],xyhp[3]),new Color(chp[0],chp[1],chp[2]),chpDev,true);}
+            
+            int cDev[]=new int[chpDev.size()];
+            Iterator<Integer> it=chpDev.iterator();
+            for(int i=0;i<cDev.length;i++){cDev[i]=it.next();}
+            
+            try{currentTarget=new SAIE_Target(name,new Rectangle(xyhp[0],xyhp[1],xyhp[2],xyhp[3]),SAIE_Util.ByteArrayToColorArray(chp),cDev,true);}
             catch(SAIE_Util.InvalidValueException e){cleanExit(1);}
         }else{
             System.err.println("Target not provided. Please give a target on next run. Exiting...");
