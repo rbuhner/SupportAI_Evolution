@@ -23,7 +23,6 @@ public class SAIE_Util {
     
     /** Presses and releases a given integer keyboard key. */
     static void typeKey(int key){
-        System.out.println(key+" is being typed.");
         r.keyPress(key);
         r.keyRelease(key);
     }
@@ -131,7 +130,7 @@ public class SAIE_Util {
         }
         return false;
     }
-    static Color[] ByteArrayToColorArray(ArrayList<byte[]> in){
+    static Color[] IntArrayToColorArray(ArrayList<int[]> in){
         Color colout[]=new Color[in.size()];
         for(int i=0;i<in.size();i++){colout[i]=new Color(in.get(i)[0],in.get(i)[1],in.get(i)[2]);}
         

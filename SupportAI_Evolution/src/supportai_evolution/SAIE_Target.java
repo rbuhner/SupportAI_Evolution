@@ -96,10 +96,11 @@ public class SAIE_Target {
             hpBar=aty;
         }
         System.out.println(name+"'s HpBar now set. HpBar length of "+hpBar.length+".");
+        hp=hpBar.length-1;
     }
     private boolean openEyesSub1(BufferedImage img){
         long cc[][]=new long[chp.length][];     //Color collection
-        for(long l[]:cc){l=new long[]{0,0,0};}
+        for(int i=0;i<cc.length;i++){cc[i]=new long[]{0,0,0};}
         int pc=0,ipc=0;                         //Pixel / Invalid Pixel count
         Color max[]=chp,min[]=chp,tc;           //Brighted/Darkest color in spectrum
         boolean found;
@@ -148,7 +149,7 @@ public class SAIE_Target {
             if(SAIE_Util.cWithinDev(chp,img.getRGB(hp,hpBar[0]),chpDev)){
                 for(hp++;hp<xyhp.width;hp++){
                     //If color found is not within deviation of avgColor, then we've hit the height of hp level.
-                    if(!SAIE_Util.cWithinDev(chp,img.getRGB(hp,hpBar[0]),chpDev)){hp--;break;}
+                    if(hp==hpBar.length||!SAIE_Util.cWithinDev(chp,img.getRGB(hp,hpBar[0]),chpDev)){hp--;break;}
                 }
             }else{
                 //As above, reversed.
@@ -158,13 +159,13 @@ public class SAIE_Target {
                 }
             }
         }else{
-            if(SAIE_Util.cWithinDev(chp,img.getRGB(hp,hpBar[0]),chpDev)){
+            if(SAIE_Util.cWithinDev(chp,img.getRGB(hp,hpBar[hp]),chpDev)){
                 for(hp++;hp<xyhp.width;hp++){
-                    if(!SAIE_Util.cWithinDev(chp,img.getRGB(hp,hpBar[0]),chpDev)){hp--;break;}
+                    if(hp==hpBar.length||!SAIE_Util.cWithinDev(chp,img.getRGB(hp,hpBar[hp]),chpDev)){hp--;break;}
                 }
             }else{
                 for(hp--;hp>-1;hp--){
-                    if(SAIE_Util.cWithinDev(chp,img.getRGB(hp,hpBar[0]),chpDev)){break;}
+                    if(SAIE_Util.cWithinDev(chp,img.getRGB(hp,hpBar[hp]),chpDev)){break;}
                 }
             }
         }
@@ -174,6 +175,7 @@ public class SAIE_Target {
     public String getName(){return name;}
     public Rectangle getHpBox(){return xyhp;}
     public Color[] getHpColor(){return chp;}
-    public float getHp(){return (float)hp/xyhp.width;}
+    public float getHp(){System.out.println("Hp:"+hp+"/"+hpBar.length);
+        return (float)hp/hpBar.length;}
     public boolean isDead(){return isDead;}
 }

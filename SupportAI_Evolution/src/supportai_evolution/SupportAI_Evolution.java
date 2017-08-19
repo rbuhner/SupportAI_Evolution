@@ -38,7 +38,7 @@ public class SupportAI_Evolution {
     private ArrayList<String> savedArgs[]=new ArrayList[]{new ArrayList<>(),new ArrayList<>()};
     
     protected boolean q;
-    private final static boolean setup=true;
+    private final static boolean setup=false;
     private byte errorLevel;
     
     private SAIE_Skill skillBar[];
@@ -50,12 +50,13 @@ public class SupportAI_Evolution {
     public static void main(String[] args) {
         my=new SupportAI_Evolution();
         
-        my.q=true;   //Turn to false when ready to run.
+        my.q=false;   //Turn to false when ready to run.
         my.errorLevel=0;
         
         //This is currently going to assume that the filepath/skill(s)/target(s) given is a valid one,
         //  until a later time when implementing more file-utils/error checking.
         for(int i=0;i<args.length;i++){
+            System.out.print(args[i]+" : ");
             if(args[i].equals("-fp")&&i+1<args.length){filePath=args[i+1];}                     //FilePath
             else if(args[i].equals("-t")&&i+1<args.length){my.savedArgs[0].add(args[i+1]);}     //Target(s)
             else if(args[i].equals("-s")&&i+1<args.length){my.savedArgs[1].add(args[i+1]);}     //Skills(s)
@@ -68,8 +69,6 @@ public class SupportAI_Evolution {
             my.errorLevel++;
         }
         
-        my.SAIE_OpenEyes();
-        
         my.SAIE_Initialize();
         if(my.q==true){
             System.out.println("Need to terminate from init(). Exiting...");
@@ -77,7 +76,8 @@ public class SupportAI_Evolution {
         }
         
         //Attempting to time AI process loop to once every second first.
-        int temp=10;
+        int temp=120;
+        System.out.println("I'm starting to do things! ~"+temp/2+"seconds available.");
         do{
             try{Thread.sleep(500);}
             catch(InterruptedException e){
@@ -131,13 +131,15 @@ public class SupportAI_Evolution {
         logger.setUseParentHandlers(false);
         System.out.println("Native hook registered. Now listening for 'Esc'.");
         
+        my.SAIE_OpenEyes();
+        
         /* Profile Loading */
         //Looks like I'm doing basic profile loading a bit early this time.
         if(!savedArgs[0].isEmpty()){    //Only taking the first target for now, but will upgrade later.
             //String name,Rectangle xyhp,Color chp,int chpIDev
             String temp="",name="";
             int xyhp[]=new int[4];
-            ArrayList<byte[]> chp=new ArrayList<>();
+            ArrayList<int[]> chp=new ArrayList<>();
             ArrayList<Integer> chpDev=new ArrayList<>();
             byte step=0;
             byte n=-1,nc=-1;
@@ -153,10 +155,10 @@ public class SupportAI_Evolution {
                         case 3:
                         case 4: xyhp[step-1]=Integer.parseInt(temp); break;
                         case 5: n=Byte.parseByte(temp); nc=n; break;
-                        case 6: chp.add(new byte[3]);
-                        case 7: chp.get(n-nc)[step-6]=Byte.parseByte(temp); break;
-                        case 8: chp.get(n-nc)[3]=Byte.parseByte(temp);
-                                if(nc>0){nc--; step=5;}
+                        case 6: chp.add(new int[3]);
+                        case 7: chp.get(n-nc)[step-6]=Integer.parseInt(temp); break;
+                        case 8: chp.get(n-nc)[2]=Integer.parseInt(temp);
+                                if(nc>1){nc--; step=5;}
                                 else{nc=n;}
                                 break;
                         case 9: chpDev.add(Integer.parseInt(temp));
@@ -164,14 +166,14 @@ public class SupportAI_Evolution {
                     }
                     step++;
                     temp="";
-                }else{temp+=savedArgs[0].get(0).length();}
+                }else{temp+=savedArgs[0].get(0).charAt(i);}
             }
             
             int cDev[]=new int[chpDev.size()];
             Iterator<Integer> it=chpDev.iterator();
             for(int i=0;i<cDev.length;i++){cDev[i]=it.next();}
             
-            try{currentTarget=new SAIE_Target(name,new Rectangle(xyhp[0],xyhp[1],xyhp[2],xyhp[3]),SAIE_Util.ByteArrayToColorArray(chp),cDev,true);}
+            try{currentTarget=new SAIE_Target(name,new Rectangle(xyhp[0],xyhp[1],xyhp[2],xyhp[3]),SAIE_Util.IntArrayToColorArray(chp),cDev,false);}
             catch(SAIE_Util.InvalidValueException e){cleanExit(1);}
         }else{
             System.err.println("Target not provided. Please give a target on next run. Exiting...");
@@ -231,6 +233,7 @@ public class SupportAI_Evolution {
         
         float hptarget = 0.75F;
         
+        currentTarget.update();
         System.out.println("Target "+currentTarget.getName()+"'s hp is currently "+currentTarget.getHp()+"%.");
         if(currentTarget.getHp()<hptarget){
             System.out.println("Attempting "+skillBar[0].getName()+" skill use on target.");
@@ -290,7 +293,7 @@ class GlobalKeyListener implements NativeKeyListener{
     public void nativeKeyPressed(NativeKeyEvent e){
         System.out.println("Key Pressed: "+NativeKeyEvent.getKeyText(e.getKeyCode()));
         
-        if (e.getKeyCode()==NativeKeyEvent.VC_ESCAPE||e.getKeyCode()==NativeKeyEvent.VC_Q){
+        if (e.getKeyCode()==NativeKeyEvent.VC_ESCAPE){
             me.q=true;
             unregisterSelf();
         }
