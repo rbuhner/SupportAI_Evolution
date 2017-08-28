@@ -149,7 +149,8 @@ public class SAIE_Target {
             if(SAIE_Util.cWithinDev(chp,img.getRGB(hp,hpBar[0]),chpDev)){
                 for(hp++;hp<xyhp.width;hp++){
                     //If color found is not within deviation of avgColor, then we've hit the height of hp level.
-                    if(hp==hpBar.length||!SAIE_Util.cWithinDev(chp,img.getRGB(hp,hpBar[0]),chpDev)){hp--;break;}
+                    if(hp>=hpBar.length-1||!SAIE_Util.cWithinDev(chp,img.getRGB(hp,hpBar[0]),chpDev)){hp--;
+                    System.out.println("Linear found hp level of "+hp+".");break;}
                 }
             }else{
                 //As above, reversed.
@@ -161,7 +162,8 @@ public class SAIE_Target {
         }else{
             if(SAIE_Util.cWithinDev(chp,img.getRGB(hp,hpBar[hp]),chpDev)){
                 for(hp++;hp<xyhp.width;hp++){
-                    if(hp==hpBar.length||!SAIE_Util.cWithinDev(chp,img.getRGB(hp,hpBar[hp]),chpDev)){hp--;break;}
+                    if(hp>=hpBar.length-1||!SAIE_Util.cWithinDev(chp,img.getRGB(hp,hpBar[hp]),chpDev)){hp--;
+                    System.out.println("Non-linear found hp level of "+hp+".");break;}
                 }
             }else{
                 for(hp--;hp>-1;hp--){

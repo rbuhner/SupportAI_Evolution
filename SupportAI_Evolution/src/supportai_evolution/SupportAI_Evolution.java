@@ -173,7 +173,7 @@ public class SupportAI_Evolution {
             Iterator<Integer> it=chpDev.iterator();
             for(int i=0;i<cDev.length;i++){cDev[i]=it.next();}
             
-            try{currentTarget=new SAIE_Target(name,new Rectangle(xyhp[0],xyhp[1],xyhp[2],xyhp[3]),SAIE_Util.IntArrayToColorArray(chp),cDev,false);}
+            try{currentTarget=new SAIE_Target(name,new Rectangle(xyhp[0],xyhp[1],xyhp[2],xyhp[3]),SAIE_Util.IntArrayToColorArray(chp),cDev,true);}
             catch(SAIE_Util.InvalidValueException e){cleanExit(1);}
         }else{
             System.err.println("Target not provided. Please give a target on next run. Exiting...");
