@@ -23,7 +23,7 @@ These are a list of objectives, tests to resolution, and date resolved.
 	Notes for later: check around health bar for similar-colored pixels,
 		to rule out environmental errors.
 
-	Encoded but untested on 08/17/2017
+	Encoded but untested on 08/18/2017
 
 3) Switch between self and target(s).	(Self-Healing Macro)
 	+ Storing of hotkeys for selecting self and party target(s).

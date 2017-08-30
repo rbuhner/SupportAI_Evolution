@@ -46,9 +46,10 @@ public class SAIE_Target {
         if(optimize){   //Color and deviation have been optimized, rectangle not yet. (later)
             //Color given will be an approximation up to the exact avg color.
             //Collecting all pixels and avg over number of pixels, seperating to get better definitions.
-            System.out.println("Attempting optimization of target "+name+"...");
+            System.out.println("Attempting optimization of "+name+"...");
             for(int i:chpDev){if(i<=0){i=32;}}
             
+            //If the invalid pixels outnumber the ones we can use, try a wider net, and if still not working, soft exit.
             if(!openEyesSub1(img)){
                 System.out.println("First level optimization failed, attempting broader optimization...");
                 
@@ -59,7 +60,7 @@ public class SAIE_Target {
                     System.out.println("Error: "+name+"'s Hp has too many invalid colors, please adjust and rerun.");
                     throw new SAIE_Util.InvalidValueException();
                 }
-            }
+            }else{System.out.println("Optimization successful.");}
         }
         
         int ty=-1;
@@ -99,10 +100,10 @@ public class SAIE_Target {
         hp=hpBar.length-1;
     }
     private boolean openEyesSub1(BufferedImage img){
-        long cc[][]=new long[chp.length][];     //Color collection
+        long cc[][]=new long[chp.length][];                     //Color collection
         for(int i=0;i<cc.length;i++){cc[i]=new long[]{0,0,0};}
-        int pc=0,ipc=0;                         //Pixel / Invalid Pixel count
-        Color max[]=chp,min[]=chp,tc;           //Brighted/Darkest color in spectrum
+        int pc=0,ipc=0;                                         //Pixel / Invalid Pixel count
+        Color max[]=chp.clone(),min[]=chp.clone(),tc;           //Brightest/Darkest color in spectrum
         boolean found;
         
         for(int y=0;y<img.getHeight();y++){
@@ -110,12 +111,12 @@ public class SAIE_Target {
                 tc=SAIE_Util.PixeltoColor(img.getRGB(x,y));
                 found=false;
                 for(int i=0;i<chp.length;i++){
-                    if(SAIE_Util.cWithinDev(chp,img.getRGB(x,y),chpDev)){
+                    if(SAIE_Util.cWithinDev(chp[i],img.getRGB(x,y),chpDev[i])){
                         cc[i][0]+=tc.getRed();
                         cc[i][1]+=tc.getGreen();
                         cc[i][2]+=tc.getBlue();
                         pc++;
-
+                        
                         if(SAIE_Util.colorDif(max[i],tc)>0){max[i]=tc;}
                         else if(SAIE_Util.colorDif(min[i],tc)<0){min[i]=tc;}
                         found=true; break;
@@ -124,19 +125,23 @@ public class SAIE_Target {
                 if(!found){ipc++;}
             }
         }
-        if(pc>ipc){ //If the invalid pixels outnumber the ones we can use, try a wider net, and if still not working, soft exit.
+        
+        if(pc>ipc){
             for(int i=0;i<chp.length;i++){
                 Color ctemp=new Color((int)(cc[i][0]/pc),(int)(cc[i][1]/pc),(int)(cc[i][2]/pc));
-                System.out.println(name+"'s Hp Color"+i+" is: "+SAIE_Util.ClosestColor(ctemp).color.toString()+".");
+                System.out.println(name+"'s Hp Color "+i+" is: "+ctemp.toString()+".");
                 chp[i]=ctemp;
 
                 int tmax=Math.abs(SAIE_Util.colorDif(chp[i],max[i]));
                 int tmin=Math.abs(SAIE_Util.colorDif(chp[i],min[i]));
                 chpDev[i]=(tmax>tmin?tmax:tmin);
-                System.out.println(name+"'s Hp Color Avg Deviation"+i+" is: "+chpDev+".");
+                System.out.println(name+"'s Hp Color Avg Deviation "+i+" is: "+chpDev[i]+".");
             }
             return true;
-        }else{return false;}
+        }else{
+            System.out.println("PC:"+pc+" IPC:"+ipc+" HpBar Length:"+img.getWidth());
+            return false;
+        }
     }
     
     /** Updating the values of the target, mainly hp/stats/etc */
@@ -149,8 +154,15 @@ public class SAIE_Target {
             if(SAIE_Util.cWithinDev(chp,img.getRGB(hp,hpBar[0]),chpDev)){
                 for(hp++;hp<xyhp.width;hp++){
                     //If color found is not within deviation of avgColor, then we've hit the height of hp level.
-                    if(hp>=hpBar.length-1||!SAIE_Util.cWithinDev(chp,img.getRGB(hp,hpBar[0]),chpDev)){hp--;
-                    System.out.println("Linear found hp level of "+hp+".");break;}
+                    if(hp>=hpBar.length-1){
+                        hp=hpBar.length-1;
+                        System.out.println("Linear found hp full at "+hp+".");
+                        break;
+                    }else if(!SAIE_Util.cWithinDev(chp,img.getRGB(hp,hpBar[0]),chpDev)){
+                        hp--;
+                        System.out.println("Linear found hp level of "+hp+".");
+                        break;
+                    }
                 }
             }else{
                 //As above, reversed.
@@ -162,8 +174,15 @@ public class SAIE_Target {
         }else{
             if(SAIE_Util.cWithinDev(chp,img.getRGB(hp,hpBar[hp]),chpDev)){
                 for(hp++;hp<xyhp.width;hp++){
-                    if(hp>=hpBar.length-1||!SAIE_Util.cWithinDev(chp,img.getRGB(hp,hpBar[hp]),chpDev)){hp--;
-                    System.out.println("Non-linear found hp level of "+hp+".");break;}
+                    if(hp>=hpBar.length-1){
+                        hp=hpBar.length-1;
+                        System.out.println("Non-linear found hp full at "+hp+".");
+                        break;
+                    }else if(!SAIE_Util.cWithinDev(chp,img.getRGB(hp,hpBar[hp]),chpDev)){
+                        hp--;
+                        System.out.println("Non-linear found hp level of "+hp+".");
+                        break;
+                    }
                 }
             }else{
                 for(hp--;hp>-1;hp--){
