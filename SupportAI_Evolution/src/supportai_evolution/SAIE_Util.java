@@ -81,10 +81,12 @@ public class SAIE_Util {
      * Currently contains a Color and an int (int usually being the difference of some Color from another.)
      */
     static class ColorUtilReturn{
+        public final String name;
         public final Color color;
         public final int number;
         
-        public ColorUtilReturn(Color c,int n){
+        public ColorUtilReturn(String s,Color c,int n){
+            name=s;
             color=c;
             number=n;
         }
@@ -104,17 +106,21 @@ public class SAIE_Util {
      * @return A ColorUtilReturn composed of the color family and shades away from it the given color is.
      */
     static ColorUtilReturn ClosestColor(Color c){
+        String strout="";
         int t=765;  //Max difference that can occur between two colors.
         Color cout=null;
         
         //Temp version, need to think of a better way...
-        if(Math.abs(colorDif(Color.WHITE,c))<t){cout=Color.WHITE; t=Math.abs(colorDif(Color.WHITE,c));}
-        if(Math.abs(colorDif(Color.RED,c))<t){cout=Color.RED; t=Math.abs(colorDif(Color.RED,c));}
-        if(Math.abs(colorDif(Color.GREEN,c))<t){cout=Color.GREEN; t=Math.abs(colorDif(Color.GREEN,c));}
-        if(Math.abs(colorDif(Color.BLUE,c))<t){cout=Color.BLUE; t=Math.abs(colorDif(Color.BLUE,c));}
-        if(Math.abs(colorDif(Color.BLACK,c))<t){cout=Color.BLACK; t=Math.abs(colorDif(Color.BLACK,c));}
+        if(simpleColorDif(Color.WHITE,c)<t){strout="WHITE";cout=Color.WHITE; t=simpleColorDif(Color.WHITE,c);}
+        if(simpleColorDif(Color.RED,c)<t){strout="RED";cout=Color.RED; t=simpleColorDif(Color.RED,c);}
+        if(simpleColorDif(Color.YELLOW,c)<t){strout="YELLOW";cout=Color.YELLOW; t=simpleColorDif(Color.YELLOW,c);}
+        if(simpleColorDif(Color.GREEN,c)<t){strout="GREEN";cout=Color.GREEN; t=simpleColorDif(Color.GREEN,c);}
+        if(simpleColorDif(Color.MAGENTA,c)<t){strout="MAGENTA";cout=Color.MAGENTA; t=simpleColorDif(Color.MAGENTA,c);}
+        if(simpleColorDif(Color.BLUE,c)<t){strout="BLUE";cout=Color.BLUE; t=simpleColorDif(Color.BLUE,c);}
+        if(simpleColorDif(Color.CYAN,c)<t){strout="CYAN";cout=Color.CYAN; t=simpleColorDif(Color.CYAN,c);}
+        if(simpleColorDif(Color.BLACK,c)<t){strout="BLACK";cout=Color.BLACK; t=simpleColorDif(Color.BLACK,c);}
         
-        return new ColorUtilReturn(cout,t);
+        return new ColorUtilReturn(strout,cout,t);
     }
     /**
      * Returns the difference between two colors, using the positive/negative to denote brighter or darker difference.
@@ -122,11 +128,28 @@ public class SAIE_Util {
      * @param b Comparing Color
      * @return The amount that Color b is different from Color a, positive if brighter, negative if darker.
      */
-    static int colorDif(Color a,Color b){return (a.getRed()-b.getRed())+(a.getGreen()-b.getGreen())+(a.getBlue()-b.getBlue());}
-    static boolean cWithinDev(Color a,int b,int dev){return Math.abs(colorDif(a,PixeltoColor(b)))<=dev;}
-    static boolean cWithinDev(Color a[],int b,int dev[]){
+    static int[] colorDif(Color a,Color b){
+        byte positive;
+        int nout;
+        
+        nout=Math.abs(a.getRed()-b.getRed())+Math.abs(a.getGreen()-b.getGreen())+Math.abs(a.getBlue()-b.getBlue());
+        if(((a.getRed()-b.getRed())+(a.getGreen()-b.getGreen())+(a.getBlue()-b.getBlue()))>0){
+            positive=1;
+        }else if(((a.getRed()-b.getRed())+(a.getGreen()-b.getGreen())+(a.getBlue()-b.getBlue()))<0){
+            positive=-1;
+        }else{
+            positive=0;
+        }
+        
+        return new int[]{positive,nout};
+    }
+    static int simpleColorDif(Color a,Color b){return Math.abs(a.getRed()-b.getRed())+Math.abs(a.getGreen()-b.getGreen())+Math.abs(a.getBlue()-b.getBlue());}
+    static boolean cWithinDev(Color a,int b,int dev){return cWithinDev(a,PixeltoColor(b),dev);}
+    static boolean cWithinDev(Color a[],int b,int dev[]){return cWithinDev(a,PixeltoColor(b),dev);}
+    static boolean cWithinDev(Color a,Color b,int dev){return Math.abs(simpleColorDif(a,b))<=dev;}
+    static boolean cWithinDev(Color a[],Color b,int dev[]){
         for(int i=0;i<a.length;i++){
-            if(Math.abs(colorDif(a[i],PixeltoColor(b)))<=dev[i]){return true;}
+            if(Math.abs(simpleColorDif(a[i],b))<=dev[i]){return true;}
         }
         return false;
     }

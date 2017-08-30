@@ -111,14 +111,14 @@ public class SAIE_Target {
                 tc=SAIE_Util.PixeltoColor(img.getRGB(x,y));
                 found=false;
                 for(int i=0;i<chp.length;i++){
-                    if(SAIE_Util.cWithinDev(chp[i],img.getRGB(x,y),chpDev[i])){
+                    if(SAIE_Util.cWithinDev(chp[i],tc,chpDev[i])){
                         cc[i][0]+=tc.getRed();
                         cc[i][1]+=tc.getGreen();
                         cc[i][2]+=tc.getBlue();
                         pc++;
                         
-                        if(SAIE_Util.colorDif(max[i],tc)>0){max[i]=tc;}
-                        else if(SAIE_Util.colorDif(min[i],tc)<0){min[i]=tc;}
+                        if(SAIE_Util.colorDif(max[i],tc)[0]==1){max[i]=tc;}
+                        else if(SAIE_Util.colorDif(min[i],tc)[0]==-1){min[i]=tc;}
                         found=true; break;
                     }
                 }
@@ -127,13 +127,17 @@ public class SAIE_Target {
         }
         
         if(pc>ipc){
+            SAIE_Util.ColorUtilReturn cutemp;
             for(int i=0;i<chp.length;i++){
+                cutemp=SAIE_Util.ClosestColor(chp[i]);
+                System.out.println("Base color "+i+" is "+chp[i].toString()+"("+cutemp.name+","+cutemp.number+")");
                 Color ctemp=new Color((int)(cc[i][0]/pc),(int)(cc[i][1]/pc),(int)(cc[i][2]/pc));
-                System.out.println(name+"'s Hp Color "+i+" is: "+ctemp.toString()+".");
+                cutemp=SAIE_Util.ClosestColor(ctemp);
+                System.out.println(name+"'s Hp Color "+i+" is: "+ctemp.toString()+"("+cutemp.name+","+cutemp.number+")"+".");
                 chp[i]=ctemp;
 
-                int tmax=Math.abs(SAIE_Util.colorDif(chp[i],max[i]));
-                int tmin=Math.abs(SAIE_Util.colorDif(chp[i],min[i]));
+                int tmax=SAIE_Util.simpleColorDif(chp[i],max[i]);
+                int tmin=SAIE_Util.simpleColorDif(chp[i],min[i]);
                 chpDev[i]=(tmax>tmin?tmax:tmin);
                 System.out.println(name+"'s Hp Color Avg Deviation "+i+" is: "+chpDev[i]+".");
             }
