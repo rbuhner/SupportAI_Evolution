@@ -24,6 +24,7 @@ These are a list of objectives, tests to resolution, and date resolved.
 		to rule out environmental errors.
 
 	Encoded but untested on 08/18/2017
+	Tested and finished on 08/31/2017 (Midnight between 30th and 31st to be exact.)
 
 3) Switch between self and target(s).	(Self-Healing Macro)
 	+ Storing of hotkeys for selecting self and party target(s).
