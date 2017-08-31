@@ -96,13 +96,15 @@ public class SAIE_Target {
             }
             hpBar=aty;
         }
-        System.out.println(name+"'s HpBar now set. HpBar length of "+hpBar.length+".");
-        hp=hpBar.length-1;
+        System.out.println(name+"'s HpBar now set. HpBar length of "+xyhp.width+".");
+        hp=xyhp.width-1;
     }
     private boolean openEyesSub1(BufferedImage img){
         long cc[][]=new long[chp.length][];                     //Color collection
         for(int i=0;i<cc.length;i++){cc[i]=new long[]{0,0,0};}
-        int pc=0,ipc=0;                                         //Pixel / Invalid Pixel count
+        int pc[]=new int[chp.length];                           //Pixel Count(s)
+        for(int i=0;i<pc.length;i++){pc[i]=0;}
+        int tpc=0,ipc=0;                                        //Total and Invalid Pixel count
         Color max[]=chp.clone(),min[]=chp.clone(),tc;           //Brightest/Darkest color in spectrum
         boolean found;
         
@@ -115,7 +117,8 @@ public class SAIE_Target {
                         cc[i][0]+=tc.getRed();
                         cc[i][1]+=tc.getGreen();
                         cc[i][2]+=tc.getBlue();
-                        pc++;
+                        pc[i]++;
+                        tpc++;
                         
                         if(SAIE_Util.colorDif(max[i],tc)[0]==1){max[i]=tc;}
                         else if(SAIE_Util.colorDif(min[i],tc)[0]==-1){min[i]=tc;}
@@ -126,12 +129,12 @@ public class SAIE_Target {
             }
         }
         
-        if(pc>ipc){
+        if(tpc>ipc){
             SAIE_Util.ColorUtilReturn cutemp;
             for(int i=0;i<chp.length;i++){
                 cutemp=SAIE_Util.ClosestColor(chp[i]);
                 System.out.println("Base color "+i+" is "+chp[i].toString()+"("+cutemp.name+","+cutemp.number+")");
-                Color ctemp=new Color((int)(cc[i][0]/pc),(int)(cc[i][1]/pc),(int)(cc[i][2]/pc));
+                Color ctemp=new Color((int)(cc[i][0]/pc[i]),(int)(cc[i][1]/pc[i]),(int)(cc[i][2]/pc[i]));
                 cutemp=SAIE_Util.ClosestColor(ctemp);
                 System.out.println(name+"'s Hp Color "+i+" is: "+ctemp.toString()+"("+cutemp.name+","+cutemp.number+")"+".");
                 chp[i]=ctemp;
@@ -139,7 +142,7 @@ public class SAIE_Target {
                 int tmax=SAIE_Util.simpleColorDif(chp[i],max[i]);
                 int tmin=SAIE_Util.simpleColorDif(chp[i],min[i]);
                 chpDev[i]=(tmax>tmin?tmax:tmin);
-                System.out.println(name+"'s Hp Color Avg Deviation "+i+" is: "+chpDev[i]+".");
+                System.out.println(name+"'s Hp Color Total Deviation "+i+" is: "+chpDev[i]+".");
             }
             return true;
         }else{

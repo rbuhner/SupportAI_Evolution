@@ -50,7 +50,7 @@ public class SupportAI_Evolution {
     public static void main(String[] args) {
         my=new SupportAI_Evolution();
         
-        my.q=true;   //Turn to false when ready to run more than one loop.
+        my.q=false;   //Turn to false when ready to run more than one loop.
         my.errorLevel=0;
         
         //This is currently going to assume that the filepath/skill(s)/target(s) given is a valid one,
