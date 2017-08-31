@@ -179,6 +179,7 @@ public class SAIE_Target {
                 }
             }
         }else{
+            if(hp>=hpBar.length-1){hp=hpBar.length-1;}
             if(SAIE_Util.cWithinDev(chp,img.getRGB(hp,hpBar[hp]),chpDev)){
                 for(hp++;hp<xyhp.width;hp++){
                     if(hp>=hpBar.length-1){

@@ -90,6 +90,7 @@ public class SupportAI_Evolution {
             //Quit and error checking
             if(my.q==true){System.out.println("Instructed to terminate. Exiting...");}
             else if(my.errorLevel>3){my.q=true;System.out.println("Too many errors. Exiting...");}
+            else if(my.currentTarget.isDead()){my.q=true;System.out.println("Target "+my.currentTarget.getName()+" has died. Exiting...");}
             else if(temp==0){System.out.println("I've run out of testing time. Exiting...");}
         }while(!my.q&&temp-->0);
         
