@@ -41,12 +41,12 @@ These are a list of objectives, tests to resolution, and date resolved.
 	+ Standardized and/or evolving (later) profiles, to work with multiple games.
 
 
-Assumptions at this level (Stage 2):
+Assumptions at this level (Stage 3):
 	~ Target needs to be part of their party.
 	~ Target needs to remain within range of healing skill.
-	- Skillset is hard-coded to AI.
-	+ Thanks to command-line args, both target and skills are given upon program startup.
-	+ Healing rate is based off target being injured.
+	+ Thanks to command-line args, both self, targets, and skills are given upon program startup.
+	~ Healing rate is based off target being injured.
 	~ All skill usage is done via typed instead of clicked actions.
-	+ Target's health bar will not change position, nor color within normal deviation.
-	+ If no target in the first party slot, the first target is assumed dead/MIA.
+	~ Target's health bar will not change position, nor color within normal deviation.
+	~ If no target in the first party slot, the first target is assumed dead/MIA.
+	+ Keyboard input to select party members is single-key.

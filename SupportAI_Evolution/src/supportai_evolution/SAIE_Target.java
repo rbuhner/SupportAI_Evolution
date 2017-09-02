@@ -26,10 +26,13 @@ public class SAIE_Target {
     private boolean isDead;     //To change mode from active to waiting and/or terminate program in early stages.
     private int hp;             //Current pixel count, which is used as the AI's sight on the hp value.
     
+    private String key;         //The key or key combo that is required to select this target.
     
-    public SAIE_Target(String name,Rectangle xyhp,Color[] chp,int[] chpIDev,boolean optimize) throws SAIE_Util.InvalidValueException{
+    public SAIE_Target(String name,Rectangle xyhp,Color[] chp,int[] chpIDev,
+            String key,boolean optimize) throws SAIE_Util.InvalidValueException{
         this.name=name;
         isDead=false;
+        this.key=key;
         
         //These will be optimized if allowed to, which allows some invalid answers to be corrected to a limited degree.
         this.xyhp=xyhp;
@@ -206,5 +209,6 @@ public class SAIE_Target {
     public Color[] getHpColor(){return chp;}
     public float getHp(){System.out.println("Hp:"+hp+"/"+hpBar.length);
         return (float)hp/hpBar.length;}
+    public String getKey(){return key;}
     public boolean isDead(){return isDead;}
 }
