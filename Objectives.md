@@ -40,6 +40,10 @@ These are a list of objectives, tests to resolution, and date resolved.
 	    Skillbar(s), any party members, any guild/alliance/friend members if needed.
 	+ Standardized and/or evolving (later) profiles, to work with multiple games.
 
+5) Tracking and Following the currentTarget (given target is not self).		(Starts moving around.)
+	+ Visually track the currentTarget on screen
+	+ If one loses visual on target, or is about to, move to keep target in sight.
+
 
 Assumptions at this level (Stage 3):
 	~ Target needs to be part of their party.

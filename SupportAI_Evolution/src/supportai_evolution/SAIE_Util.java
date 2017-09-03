@@ -21,7 +21,7 @@ public class SAIE_Util {
     
     static Robot r;
     
-    //Will expand to a greater list if needed (may want to load a file from elsewhere?)
+    //Will expand to a greater list at need (may want to load a file from elsewhere?)
     static public enum KEYSTRINGS{  //Now that I have the switch and enum,
         A(KeyEvent.VK_A),           //  need to run a test to see which is faster...
         B(KeyEvent.VK_B),
@@ -183,7 +183,8 @@ public class SAIE_Util {
      * Returns the difference between two colors, using the positive/negative to denote brighter or darker difference.
      * @param a Origin Color to compare to
      * @param b Comparing Color
-     * @return The amount that Color b is different from Color a, positive if brighter, negative if darker.
+     * @return An array denoting first: if the second color brighter,darker, or the same brightness as the first,
+     *      and second: the amount of shades the second color is from the first.
      */
     static int[] colorDif(Color a,Color b){
         byte positive;

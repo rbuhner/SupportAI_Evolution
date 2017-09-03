@@ -9,7 +9,7 @@ package supportai_evolution;
  *  This is an evolving compilation of research and work to create a (hopefully) self-sufficient MMO Support AI, SAI-E
  *  (Stage 1) First Activation Loops: Theoretically finished 08/06/2017
  *  (Stage 2) EyesOpen~Smart Healing: Finished and tested 08/31/2017
- *  (Stage 3) HealAll~Self and Party: In-Progress
+ *  (Stage 3) HealAll~Self and Party: Theoretically finished 09/02/2017
  * @author Robert
  */
 
@@ -97,7 +97,8 @@ public class SupportAI_Evolution {
             //Quit and error checking
             if(my.q==true){System.out.println("Instructed to terminate. Exiting...");}
             else if(my.errorLevel>3){my.q=true;System.out.println("Too many errors. Exiting...");}
-            else if(my.currentTarget.isDead()){my.q=true;System.out.println("Target "+my.currentTarget.getName()+" has died. Exiting...");}
+            else if(my.self.isDead()){my.q=true;System.out.println("I have died. Exiting...");}
+            else if(my.party[0].isDead()){my.q=true;System.out.println("Target "+my.party[0].getName()+" has died. Exiting...");}
             else if(temp==0){System.out.println("I've run out of testing time. Exiting...");}
         }while(!my.q&&temp-->0);
         
@@ -282,7 +283,7 @@ public class SupportAI_Evolution {
         }else if(party[0].getHp()<hptarget){
             if(currentTarget!=party[0]){selectTarget(party[0]);}
             if(skillBar[0].getCDLeft()<=0){
-                System.out.println("Attempting "+skillBar[0].getName()+" skill use on party[0].");
+                System.out.println("Attempting "+skillBar[0].getName()+" skill use on "+party[0].getName()+".");
                 skillBar[0].use();
             }
         }
