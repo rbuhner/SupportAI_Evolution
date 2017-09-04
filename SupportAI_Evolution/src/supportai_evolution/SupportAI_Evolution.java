@@ -9,10 +9,12 @@ package supportai_evolution;
  *  This is an evolving compilation of research and work to create a (hopefully) self-sufficient MMO Support AI, SAI-E
  *  (Stage 1) First Activation Loops: Theoretically finished 08/06/2017
  *  (Stage 2) EyesOpen~Smart Healing: Finished and tested 08/31/2017
+ *  (Stage 4) Profile Saving and Loading: In-Progress...
  * @author Robert
  */
 
 import java.awt.AWTException;
+import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.Toolkit;
@@ -226,6 +228,20 @@ public class SupportAI_Evolution {
                 cleanExit(1);
             }
         }
+    }
+    
+    private void loadProfile(){
+        //Assuming conversion of above into file format, sans -fp of course.
+        //-tag:data:data2;
+        //Ex: -t:name:xyhpx:xyhpy:xyhpw:xyhph:chpn:chpr:chpg:chpb:||:chpDev:||;
+        String read="";
+        String GameName;
+        class saveTarget{String name="";Rectangle xyr=new Rectangle();Color cBar[]=new Color[2];float cDev[]=new float[2];}
+        saveTarget sTarget=new saveTarget();
+        class SaveSkill{String name;int cd;char key;}
+        SaveSkill sskill=new SaveSkill();
+        
+        
     }
     
     /** Where SAI-E processes choices and skill usage. */
