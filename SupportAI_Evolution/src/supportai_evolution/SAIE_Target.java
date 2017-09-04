@@ -203,6 +203,7 @@ public class SAIE_Target {
     public String getName(){return name;}
     public Rectangle getHpBox(){return xyhp;}
     public Color[] getHpColor(){return chp;}
+    public int[] getHpDev(){return chpDev;}
     public float getHp(){System.out.println("Hp:"+hp+"/"+hpBar.length);
         return (float)hp/hpBar.length;}
     public String getKey(){return key;}

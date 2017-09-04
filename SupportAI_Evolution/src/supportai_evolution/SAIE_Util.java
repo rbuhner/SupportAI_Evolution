@@ -222,7 +222,7 @@ public class SAIE_Util {
         return colout;
     }
     
-    class File{
+    static class File{
         String path;
         java.io.File file;
         FileInputStream fin;
@@ -246,6 +246,24 @@ public class SAIE_Util {
                 try{return (char)fin.read();}catch(IOException e){System.err.println("Unable to read character.");}
             }else{System.err.println("Unable to read from file.");}
             return '-';
+        }
+        public String readTo(char c){
+            String strout="";
+            char t;
+            
+            if(file.canRead()){
+                if(write){
+                    if(fout!=null){try{fout.close();}catch(IOException e){}} //If it's not there to close, it's not there to worry about.
+                    try{fin=new FileInputStream(file);}catch(FileNotFoundException e){} //Already checked for and handled.
+                    write=false;
+                }
+                try{
+                    t=(char)fin.read();
+                    if(t!=c){strout+=t;}
+                    else{return strout;}
+                }catch(IOException e){System.err.println("Unable to read character after \""+strout+'"');}
+            }else{System.err.println("Unable to read from file.");}
+            return "";
         }
         
         public void startWrite(){write=true;}
