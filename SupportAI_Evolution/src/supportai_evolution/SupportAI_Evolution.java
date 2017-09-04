@@ -39,7 +39,7 @@ public class SupportAI_Evolution {
     
     //These will likely be temporary until profile saving/loading is implemented.
     private ArrayList<String> savedArgs[]=new ArrayList[]{new ArrayList<>(),new ArrayList<>()};
-    private String savedArgSelf="";
+    private ArrayList<String> savedArgSelf=new ArrayList<>();
     
     protected boolean q;
     private final static boolean setup=false;
@@ -64,7 +64,7 @@ public class SupportAI_Evolution {
         for(int i=0;i<args.length;i++){
             System.out.print(args[i]+" : ");
             if(args[i].equals("-fp")&&i+1<args.length){filePath=args[i+1];}                     //FilePath
-            else if(args[i].equals("-ts")&&i+1<args.length){my.savedArgSelf=args[i+1];}         //Target (Self)
+            else if(args[i].equals("-ts")&&i+1<args.length){my.savedArgSelf.add(args[i+1]);}         //Target (Self)
             else if(args[i].equals("-tp")&&i+1<args.length){my.savedArgs[0].add(args[i+1]);}    //Target (Party)
             else if(args[i].equals("-s")&&i+1<args.length){my.savedArgs[1].add(args[i+1]);}     //Skills(s)
         }
@@ -147,7 +147,7 @@ public class SupportAI_Evolution {
         //Only taking the first target for now, but will upgrade to full party with profile implementation.
         if(!savedArgs[0].isEmpty()){
             party=new SAIE_Target[1];
-            initTarget(party[0]);
+            party[0]=initTarget(party[0],savedArgs[0]);
         }else{
             System.err.println("Target not provided. Please give a target on next run. Exiting...");
             cleanExit(1);
@@ -182,7 +182,7 @@ public class SupportAI_Evolution {
             cleanExit(1);
         }
     }
-    private void initTarget(SAIE_Target target){
+    private SAIE_Target initTarget(SAIE_Target target,ArrayList<String> arg){
         //String name,Rectangle xyhp,Color chp,int chpIDev
         String temp="",name="",key="";
         int xyhp[]=new int[4];
@@ -193,8 +193,8 @@ public class SupportAI_Evolution {
 
         //name:xyhpx:xyhpy:xyhpw:xyhph:chpn:chpr:chpg:chpb:||:chpDev:||:key:
         //~any~:####:####:####:####:#:###:###:###:||:###:||:~any~:
-        for(int i=0;i<savedArgs[0].get(0).length();i++){
-            if(savedArgs[0].get(0).charAt(i)==':'){
+        for(int i=0;i<arg.get(0).length();i++){
+            if(arg.get(0).charAt(i)==':'){
                 switch(step){
                     case 0:     name=temp; break;
 
@@ -214,14 +214,14 @@ public class SupportAI_Evolution {
                                 break;
 
                     case 9:     chpDev.add(Integer.parseInt(temp));
-                                if(nc>0){nc--; step=8;}
+                                if(nc>1){nc--; step=8;}
                                 break;
 
                     case 10:    key=temp;
                 }
                 step++;
                 temp="";
-            }else{temp+=savedArgs[0].get(0).charAt(i);}
+            }else{temp+=arg.get(0).charAt(i);}
         }
 
         int cDev[]=new int[chpDev.size()];
@@ -231,6 +231,7 @@ public class SupportAI_Evolution {
         try{target=new SAIE_Target(name,new Rectangle(xyhp[0],xyhp[1],xyhp[2],xyhp[3]),
                 SAIE_Util.IntArrayToColorArray(chp),cDev,key,true);}
         catch(SAIE_Util.InvalidValueException e){cleanExit(1);}
+        return target;
     }
     
     private void SAIE_OpenEyes(){   //Using OpenEyes as self-oriented visual initialization.
@@ -255,7 +256,7 @@ public class SupportAI_Evolution {
             System.err.println("No info on self. Please give on self on next run. Exiting...");
             cleanExit(1);
         }else{
-            initTarget(self);
+            self=initTarget(self,savedArgSelf);
         }
     }
     
@@ -275,13 +276,19 @@ public class SupportAI_Evolution {
         
         //Self preservation instinct, check and heal self before healing another.
         if(self.getHp()<hptarget){
-            if(currentTarget!=self){selectTarget(self);}
+            if(currentTarget!=self){
+                System.out.println("Selecting self.");
+                selectTarget(self);
+            }
             if(skillBar[0].getCDLeft()<=0){
                 System.out.println("Attempting "+skillBar[0].getName()+" skill use on self.");
                 skillBar[0].use();
             }
         }else if(party[0].getHp()<hptarget){
-            if(currentTarget!=party[0]){selectTarget(party[0]);}
+            if(currentTarget!=party[0]){
+                System.out.println("Selecting party[0].");
+                selectTarget(party[0]);
+            }
             if(skillBar[0].getCDLeft()<=0){
                 System.out.println("Attempting "+skillBar[0].getName()+" skill use on "+party[0].getName()+".");
                 skillBar[0].use();
