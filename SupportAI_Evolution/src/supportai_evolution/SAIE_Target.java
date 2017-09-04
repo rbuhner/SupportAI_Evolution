@@ -26,10 +26,13 @@ public class SAIE_Target {
     private boolean isDead;     //To change mode from active to waiting and/or terminate program in early stages.
     private int hp;             //Current pixel count, which is used as the AI's sight on the hp value.
     
+    private String key;         //The key or key combo that is required to select this target.
     
-    public SAIE_Target(String name,Rectangle xyhp,Color[] chp,int[] chpIDev,boolean optimize) throws SAIE_Util.InvalidValueException{
+    public SAIE_Target(String name,Rectangle xyhp,Color[] chp,int[] chpIDev,
+            String key,boolean optimize) throws SAIE_Util.InvalidValueException{
         this.name=name;
         isDead=false;
+        this.key=key;
         
         //These will be optimized if allowed to, which allows some invalid answers to be corrected to a limited degree.
         this.xyhp=xyhp;
@@ -163,11 +166,9 @@ public class SAIE_Target {
                     //If color found is not within deviation of avgColor, then we've hit the height of hp level.
                     if(hp>=hpBar.length-1){
                         hp=hpBar.length-1;
-                        System.out.println("Linear found hp full at "+hp+".");
                         break;
                     }else if(!SAIE_Util.cWithinDev(chp,img.getRGB(hp,hpBar[0]),chpDev)){
                         hp--;
-                        System.out.println("Linear found hp level of "+hp+".");
                         break;
                     }
                 }
@@ -184,11 +185,9 @@ public class SAIE_Target {
                 for(hp++;hp<xyhp.width;hp++){
                     if(hp>=hpBar.length-1){
                         hp=hpBar.length-1;
-                        System.out.println("Non-linear found hp full at "+hp+".");
                         break;
                     }else if(!SAIE_Util.cWithinDev(chp,img.getRGB(hp,hpBar[hp]),chpDev)){
                         hp--;
-                        System.out.println("Non-linear found hp level of "+hp+".");
                         break;
                     }
                 }
@@ -206,5 +205,6 @@ public class SAIE_Target {
     public Color[] getHpColor(){return chp;}
     public float getHp(){System.out.println("Hp:"+hp+"/"+hpBar.length);
         return (float)hp/hpBar.length;}
+    public String getKey(){return key;}
     public boolean isDead(){return isDead;}
 }

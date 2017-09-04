@@ -16,22 +16,34 @@ public class SAIE_Skill {
     private final skillType stype;
     private final char key;
     
-    public SAIE_Skill(String name,skillType stype,char key){
+    private final int cooldown;
+    private int cdLeft;
+    
+    public SAIE_Skill(String name,skillType stype,char key,int cd){
         this.name=name;
         this.stype=stype;
         this.key=key;
+        cooldown=cd;
     }
     
     public String getName(){return name;}
     public skillType getSkillType(){return stype;}
     public char getKey(){return key;}
+    public int getCDLeft(){return cdLeft;}
     
     /**
      * Function guarding use of the skill, will contain cooldowns, costs, etc. later.
      * @return Returns success of skill use.
     */
     public boolean use(){
-        SAIE_Util.typeKey(key);
-        return true;
+        if(cdLeft<=0){
+            SAIE_Util.typeKey(key);
+            cdLeft=cooldown;
+            return true;
+        }else{return false;}
+    }
+    
+    public void update(){
+        if(cdLeft>0){cdLeft--;}
     }
 }

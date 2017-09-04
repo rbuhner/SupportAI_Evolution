@@ -25,6 +25,63 @@ public class SAIE_Util {
     
     static Robot r;
     
+    //Will expand to a greater list at need (may want to load a file from elsewhere?)
+    static public enum KEYSTRINGS{  //Now that I have the switch and enum,
+        A(KeyEvent.VK_A),           //  need to run a test to see which is faster...
+        B(KeyEvent.VK_B),
+        C(KeyEvent.VK_C),
+        D(KeyEvent.VK_D),
+        E(KeyEvent.VK_E),
+        F(KeyEvent.VK_F),
+        G(KeyEvent.VK_G),
+        H(KeyEvent.VK_H),
+        I(KeyEvent.VK_I),
+        J(KeyEvent.VK_J),
+        K(KeyEvent.VK_K),
+        L(KeyEvent.VK_L),
+        M(KeyEvent.VK_M),
+        N(KeyEvent.VK_N),
+        O(KeyEvent.VK_O),
+        P(KeyEvent.VK_P),
+        Q(KeyEvent.VK_Q),
+        R(KeyEvent.VK_R),
+        S(KeyEvent.VK_S),
+        T(KeyEvent.VK_T),
+        U(KeyEvent.VK_U),
+        V(KeyEvent.VK_V),
+        W(KeyEvent.VK_W),
+        X(KeyEvent.VK_X),
+        Y(KeyEvent.VK_Y),
+        Z(KeyEvent.VK_Z),
+        
+        ZERO(KeyEvent.VK_0),
+        ONE(KeyEvent.VK_1),
+        TWO(KeyEvent.VK_2),
+        THREE(KeyEvent.VK_3),
+        FOUR(KeyEvent.VK_4),
+        FIVE(KeyEvent.VK_5),
+        SIX(KeyEvent.VK_6),
+        SEVEN(KeyEvent.VK_7),
+        EIGHT(KeyEvent.VK_8),
+        NINE(KeyEvent.VK_9),
+        
+        F1(KeyEvent.VK_F1),
+        F2(KeyEvent.VK_F2),
+        F3(KeyEvent.VK_F3),
+        F4(KeyEvent.VK_F4),
+        F5(KeyEvent.VK_F5),
+        
+        SHIFT(KeyEvent.VK_SHIFT),
+        SLASH(KeyEvent.VK_SLASH),
+        SPACE(KeyEvent.VK_SPACE),
+        TAB(KeyEvent.VK_TAB);
+        
+        private final int value;
+        
+        private KEYSTRINGS(int v){value=v;}
+        public int code(){return value;}
+    }
+    
     /** Presses and releases a given integer keyboard key. */
     static void typeKey(int key){
         r.keyPress(key);
@@ -130,7 +187,8 @@ public class SAIE_Util {
      * Returns the difference between two colors, using the positive/negative to denote brighter or darker difference.
      * @param a Origin Color to compare to
      * @param b Comparing Color
-     * @return The amount that Color b is different from Color a, positive if brighter, negative if darker.
+     * @return An array denoting first: if the second color brighter,darker, or the same brightness as the first,
+     *      and second: the amount of shades the second color is from the first.
      */
     static int[] colorDif(Color a,Color b){
         byte positive;
