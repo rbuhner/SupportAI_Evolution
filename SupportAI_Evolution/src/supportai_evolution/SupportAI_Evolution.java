@@ -9,11 +9,8 @@ package supportai_evolution;
  *  This is an evolving compilation of research and work to create a (hopefully) self-sufficient MMO Support AI, SAI-E
  *  (Stage 1) First Activation Loops: Theoretically finished 08/06/2017
  *  (Stage 2) EyesOpen~Smart Healing: Finished and tested 08/31/2017
-<<<<<<< HEAD
- *  (Stage 4) Profile Saving and Loading: In-Progress...
-=======
  *  (Stage 3) HealAll~Self and Party: Theoretically finished 09/02/2017
->>>>>>> master
+ *  (Stage 4) Profile Saving and Loading: In-Progress...
  * @author Robert
  */
 
