@@ -140,6 +140,12 @@ public class SupportAI_Evolution {
         logger.setUseParentHandlers(false);
         System.out.println("Native hook registered. Now listening for 'Esc'.");
         
+        try{Thread.sleep(500);}
+        catch(InterruptedException e){
+            System.out.println("Something interrupted thread sleep.");
+            my.errorLevel++;
+        }
+        
         /* Profile Loading */
         if(file==null){
             try{file = new SAIE_Util.File(filePath+profileName);}
@@ -200,22 +206,48 @@ public class SupportAI_Evolution {
         //Assuming conversion of above into file format, sans -fp of course.
         //-tag:data:data2;
         //Ex: -t:name:xyhpx:xyhpy:xyhpw:xyhph:chpn:chpr:chpg:chpb:||:chpDev:||;
-        //String read="";   //Used for diagnostic purposes.
+        String read="",read2="";   //Used for diagnostic purposes.
         ArrayList<String> args = new ArrayList<>();
         boolean eof=false;  //End of File
         
         //Look for tags -gn = GameName, -ts = Target Self, -tp = Target Party, -s = Skill
         do{
             //Need to look into a more efficient way...
-            switch(file.readTo(':')){
-                case "-gn": args.add(file.readTo(';')); break;
-                case "-ts": 
-                case "-tp": optimize.add(file.readTo(':').equals('1'));
-                case "-s":  args.add(file.readTo(';'));
+            read=file.readTo(':');
+            System.out.println(read+" | "+read.length());
+            
+            try{Thread.sleep(50);}
+            catch(InterruptedException e){
+                System.out.println("Something interrupted thread sleep.");
+                my.errorLevel++;
+            }
+            
+            switch(read){
+                case "-gn": System.out.println("Case -gn");
+                            args.add(read2=file.readTo(';'));
+                            System.out.println('\t'+read2);
                             break;
-                case ";":   eof=true;
+                case "-ts": System.out.println("Case -ts");
+                            optimize.add(file.readTo(':').equals('1'));
+                            args.add(read2=file.readTo(';'));
+                            System.out.println('\t'+read2);
+                            break;
+                case "-tp": System.out.println("Case -tp");
+                            optimize.add(file.readTo(':').equals('1'));
+                            args.add(read2=file.readTo(';'));
+                            System.out.println('\t'+read2);
+                            break;
+                case "-s":  System.out.println("Case -s");
+                            args.add(read2=file.readTo(';'));
+                            System.out.println('\t'+read2);
+                            break;
+                case ";":   System.out.println("Case ;");
+                            eof=true;
+                            break;
+                default:    System.err.println("Profile loading error.");
             }
         }while(!eof);
+        System.out.println("Profile loaded.");
         
         return args;
     }

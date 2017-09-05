@@ -233,6 +233,7 @@ public class SAIE_Util {
             this.path=path;
             file=new java.io.File(path);
             if(!file.exists()){file.createNewFile();}
+            try{fin=new FileInputStream(file);}catch(FileNotFoundException e){}
         }
         
         public void startRead(){write=false;}
@@ -258,9 +259,12 @@ public class SAIE_Util {
                     write=false;
                 }
                 try{
-                    t=(char)fin.read();
-                    if(t!=c){strout+=t;}
-                    else{return strout;}
+                    do{
+                        t=(char)fin.read();
+                        if(t==c){return strout;}
+                        else if(t=='\n'){/* Do nothing / next */}
+                        else{strout+=t;}
+                    }while(true);
                 }catch(IOException e){System.err.println("Unable to read character after \""+strout+'"');}
             }else{System.err.println("Unable to read from file.");}
             return "";
