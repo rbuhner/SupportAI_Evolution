@@ -54,7 +54,7 @@ v-------v-------v Not fully developed ideas yet. v-------v-------v
 
  - Environmental understanding / Visual pathfinding.
  |- Map/Minimap usage, abstract pathfinding.
- |- Wandering/Exploring (Wonder?)
+ |- Wandering/Exploring (Wonder/Curiosity?)
 
  - Event- and logical-based memory (Theory: The mind is a network/pattern of memories that, when
 	certain inputs come up, fit within the input pattern of one or more memories, leading to
@@ -70,7 +70,7 @@ v-------v-------v Not fully developed ideas yet. v-------v-------v
  |- Voice/Speech recognition, for further understanding of language, and easier communication.
  |- Music recognition, because it seems a shame to let an intelligence be tone-deaf.
 
- - 
+ - Natural Language (of some sort)
 
 |------------------------------------------------||------------------------------------------------|
 
