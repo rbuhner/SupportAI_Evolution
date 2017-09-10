@@ -72,6 +72,12 @@ v-------v-------v Not fully developed ideas yet. v-------v-------v
 
  - Natural Language (of some sort)
 
+ - UI Experimentation (Understanding skill costs and effects through usage, and coming to it's own
+	efficiency ex: keeping people alive while not running out of mana [since running out of mana
+	tends to kill people too.])
+
+ - 
+
 |------------------------------------------------||------------------------------------------------|
 
 Assumptions at this level (Stage 4):

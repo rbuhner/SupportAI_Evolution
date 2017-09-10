@@ -197,7 +197,7 @@ public class SAIE_Target {
                 }
             }
         }
-        if(hp==-1){isDead=true;}
+        if(hp<=-1){isDead=true;}
     }
     
     public String getName(){return name;}

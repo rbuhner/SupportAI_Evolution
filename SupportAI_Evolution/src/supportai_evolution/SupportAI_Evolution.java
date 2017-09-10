@@ -206,40 +206,27 @@ public class SupportAI_Evolution {
         //Assuming conversion of above into file format, sans -fp of course.
         //-tag:data:data2;
         //Ex: -t:name:xyhpx:xyhpy:xyhpw:xyhph:chpn:chpr:chpg:chpb:||:chpDev:||;
-        String read="",read2="";   //Used for diagnostic purposes.
+        //String read="",read2="";   //Used for diagnostic purposes.
         ArrayList<String> args = new ArrayList<>();
         boolean eof=false;  //End of File
         
         //Look for tags -gn = GameName, -ts = Target Self, -tp = Target Party, -s = Skill
         do{
             //Need to look into a more efficient way...
-            read=file.readTo(':');
-            System.out.println(read+" | "+read.length());
-            
-            try{Thread.sleep(50);}
-            catch(InterruptedException e){
-                System.out.println("Something interrupted thread sleep.");
-                my.errorLevel++;
-            }
-            
-            switch(read){
+            switch(file.readTo(':')){
                 case "-gn": System.out.println("Case -gn");
-                            args.add(read2=file.readTo(';'));
-                            System.out.println('\t'+read2);
+                            args.add(file.readTo(';'));
                             break;
                 case "-ts": System.out.println("Case -ts");
                             optimize.add(file.readTo(':').equals('1'));
-                            args.add(read2=file.readTo(';'));
-                            System.out.println('\t'+read2);
+                            args.add(file.readTo(';'));
                             break;
                 case "-tp": System.out.println("Case -tp");
                             optimize.add(file.readTo(':').equals('1'));
-                            args.add(read2=file.readTo(';'));
-                            System.out.println('\t'+read2);
+                            args.add(file.readTo(';'));
                             break;
                 case "-s":  System.out.println("Case -s");
-                            args.add(read2=file.readTo(';'));
-                            System.out.println('\t'+read2);
+                            args.add(file.readTo(';'));
                             break;
                 case ";":   System.out.println("Case ;");
                             eof=true;
