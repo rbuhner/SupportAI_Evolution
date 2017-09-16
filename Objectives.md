@@ -44,8 +44,15 @@ These are a list of objectives, tests to resolution, and date resolved.
 	+ Standardized and/or evolving (later) profiles, to work with multiple games.
 
 	Encoded on 09/04/2017
+	Tested and finished on 09/16/2017
 
-5) Tracking and Following the currentTarget (given target is not self).		(Starts moving around.)
+5) Basic OCR (Optical Character Recognition)		(Can work with more diverse inputs.)
+	+ Loading and storing specific font(s) and recognition parameters.
+	+ Ability to optically read the correct characters in a given area.
+	+ Ability to correctly group characters to find targeted words.
+	+ Loading and storing of targeted words and "meanings" (currently related actions?).
+
+6) Tracking and Following the currentTarget (given target is not self).		(Starts moving around.)
 	+ Visually track the currentTarget on screen
 	+ If one loses visual on target, or is about to, move to keep target in sight.
 		+ Visually track path the target moves in when possible, and move where they do.
@@ -80,13 +87,14 @@ v-------v-------v Not fully developed ideas yet. v-------v-------v
 
 |------------------------------------------------||------------------------------------------------|
 
-Assumptions at this level (Stage 4):
+Assumptions at this level (Stage 5):
 	~ Target needs to be part of their party.
 	~ Target needs to remain within range of healing skill.
-	- Thanks to command-line args, both self, targets, and skills are given upon program startup.
-	+ Using filed profiles, self, targets, and skills are given upon program startup.
+	~ Command-line parameters give directory and target file.
+	~ Using file profiles, self, targets, and skills are given upon program startup.
 	~ Healing rate is based off self and party being injured, restrained by cooldowns.
 	~ All skill usage is done via typed instead of clicked actions.
 	~ Target's health bar will not change position, nor color within normal deviations.
 	~ If no target in the first party slot, the first target is assumed dead/MIA.
 	~ Keyboard input to select party members is single-key.
+	+ Other commands may be given via on-screen typed 'interface'?

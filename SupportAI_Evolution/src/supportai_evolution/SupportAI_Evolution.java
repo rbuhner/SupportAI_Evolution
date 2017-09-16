@@ -186,7 +186,7 @@ public class SupportAI_Evolution {
                         case 0: name=temp; break;
                         case 1: type=temp; break;
                         case 2: key=temp.charAt(0); break;
-                        case 3: cd=Integer.getInteger(temp);
+                        case 3: cd=Integer.parseInt(temp);
                     }
                     step++;
                     temp="";
@@ -310,7 +310,7 @@ public class SupportAI_Evolution {
         int cDev[]=new int[chpDev.size()];
         Iterator<Integer> it=chpDev.iterator();
         for(int i=0;i<cDev.length;i++){cDev[i]=it.next();}
-
+        
         try{target=new SAIE_Target(name,new Rectangle(xyhp[0],xyhp[1],xyhp[2],xyhp[3]),
                 SAIE_Util.IntArrayToColorArray(chp),cDev,key,opt);}
         catch(SAIE_Util.InvalidValueException e){cleanExit(1);}
@@ -355,14 +355,14 @@ public class SupportAI_Evolution {
     }
     private void selectTarget(SAIE_Target target){
         //Currently assumes a single key at this time, will upgrade to multikey (like shift-key) later.
+        System.out.println('\''+target.getKey()+'\'');
         SAIE_Util.typeKey(SAIE_Util.KEYSTRINGS.valueOf(target.getKey()).code());
         currentTarget=target;
     }
     
     private void saveProfile(){
         if(file!=null){
-            try{
-                file.fout.flush();
+            
                 file.write("-gn:"+currentGame+";\n");
                 
                 //Saving Self
@@ -371,7 +371,7 @@ public class SupportAI_Evolution {
                         self.getHpColor().length+':');
                     for(Color c:self.getHpColor()){file.write(""+c.getRed()+':'+c.getGreen()+':'+c.getBlue()+':');}
                     for(int i:self.getHpDev()){file.write(""+i+':');}
-                    file.write(self.getKey()+";\n");
+                    file.write(self.getKey()+":;\n");
                 
                 //Saving each member of the Party
                 for(SAIE_Target t:party){
@@ -380,22 +380,22 @@ public class SupportAI_Evolution {
                             t.getHpColor().length+':');
                         for(Color c:t.getHpColor()){file.write(""+c.getRed()+':'+c.getGreen()+':'+c.getBlue()+':');}
                         for(int i:t.getHpDev()){file.write(""+i+':');}
-                        file.write(t.getKey()+";\n");
+                        file.write(t.getKey()+":;\n");
                 }
                 
                 //Saving each Skill
                 for(SAIE_Skill s:skillBar){
-                    file.write("-s:"+s.getName()+':'+s.getSkillType().toString()+':'+s.getCD()+";\n");
+                    file.write("-s:"+s.getName()+':'+s.getSkillType().toString()+':'+s.getKey()+':'+s.getCD()+":;\n");
                 }
                 
                 //End-of-File
                 file.write(";:");
-            }catch(IOException e){
+            /*}catch(IOException e){
                 //Something went wrong writing profile to file.
                 System.err.println("Unable to save profile due to error in file-out stream.");
                 System.err.println("Please check the profile at "+file.path+" for possible errors.");
                 file.close();
-            }
+            }*/
         }
     }
     
