@@ -33,6 +33,9 @@ These are a list of objectives, tests to resolution, and date resolved.
 	+ Add cooldown counting so it doesn't spam the skill too much.
 	+ Add target names for better code/output notes.
 
+	Encoded on 09/02/2017
+	Tested and finished on 09/04/2017
+
 4) Creating, saving, and loading game profiles.		(Starts remembering, paving towards optimization.)
 	+ File creation, loading, and updating, with error checking.
 	+ Creation of game profile file if not previously created, update thereafter.
@@ -40,17 +43,58 @@ These are a list of objectives, tests to resolution, and date resolved.
 	    Skillbar(s), any party members, any guild/alliance/friend members if needed.
 	+ Standardized and/or evolving (later) profiles, to work with multiple games.
 
-5) Tracking and Following the currentTarget (given target is not self).		(Starts moving around.)
+	Encoded on 09/04/2017
+	Tested and finished on 09/16/2017
+
+5) Basic OCR (Optical Character Recognition)		(Can work with more diverse inputs.)
+	+ Loading and storing specific font(s) and recognition parameters.
+	+ Ability to optically read the correct characters in a given area.
+	+ Ability to correctly group characters to find targeted words.
+	+ Loading and storing of targeted words and "meanings" (currently related actions?).
+
+6) Tracking and Following the currentTarget (given target is not self).		(Starts moving around.)
 	+ Visually track the currentTarget on screen
 	+ If one loses visual on target, or is about to, move to keep target in sight.
+		+ Visually track path the target moves in when possible, and move where they do.
 
+v-------v-------v Not fully developed ideas yet. v-------v-------v
 
-Assumptions at this level (Stage 3):
+ - Environmental understanding / Visual pathfinding.
+ |- Map/Minimap usage, abstract pathfinding.
+ |- Wandering/Exploring (Wonder/Curiosity?)
+
+ - Event- and logical-based memory (Theory: The mind is a network/pattern of memories that, when
+	certain inputs come up, fit within the input pattern of one or more memories, leading to
+	learned reactions (experience -> right decisions, the "I've seen this before" process.)
+
+ - Individuality may be inevitable when two entities are experiencing different space/times, and
+	therefore have different memories, but what happens when two entities can 'sync' their memories
+	completely? Need a way to maintain individual thought process / individuality even when the
+	memories are completely the same.
+
+ - Sound recognition (useful for noticing input outside of visual range, like footsteps or 
+	language-independant cries for help.)
+ |- Voice/Speech recognition, for further understanding of language, and easier communication.
+ |- Music recognition, because it seems a shame to let an intelligence be tone-deaf.
+
+ - Natural Language (of some sort)
+
+ - UI Experimentation (Understanding skill costs and effects through usage, and coming to it's own
+	efficiency ex: keeping people alive while not running out of mana [since running out of mana
+	tends to kill people too.])
+
+ - 
+
+|------------------------------------------------||------------------------------------------------|
+
+Assumptions at this level (Stage 5):
 	~ Target needs to be part of their party.
 	~ Target needs to remain within range of healing skill.
-	+ Thanks to command-line args, both self, targets, and skills are given upon program startup.
-	~ Healing rate is based off target being injured.
+	~ Command-line parameters give directory and target file.
+	~ Using file profiles, self, targets, and skills are given upon program startup.
+	~ Healing rate is based off self and party being injured, restrained by cooldowns.
 	~ All skill usage is done via typed instead of clicked actions.
-	~ Target's health bar will not change position, nor color within normal deviation.
+	~ Target's health bar will not change position, nor color within normal deviations.
 	~ If no target in the first party slot, the first target is assumed dead/MIA.
-	+ Keyboard input to select party members is single-key.
+	~ Keyboard input to select party members is single-key.
+	+ Other commands may be given via on-screen typed 'interface'?

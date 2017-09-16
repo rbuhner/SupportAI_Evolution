@@ -8,6 +8,10 @@ package supportai_evolution;
 import java.awt.Color;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -216,5 +220,79 @@ public class SAIE_Util {
         for(int i=0;i<in.size();i++){colout[i]=new Color(in.get(i)[0],in.get(i)[1],in.get(i)[2]);}
         
         return colout;
+    }
+    
+    static class File{
+        String path;
+        java.io.File file;
+        FileInputStream fin;
+        FileOutputStream fout;
+        boolean write=false;
+        
+        public File(String path) throws IOException{
+            this.path=path;
+            file=new java.io.File(path);
+            if(!file.exists()){file.createNewFile();}
+            try{fin=new FileInputStream(file);}catch(FileNotFoundException e){}
+        }
+        
+        public void startRead(){write=false;}
+        public char read(){
+            if(file.canRead()){
+                if(write){
+                    if(fout!=null){try{fout.close();}catch(IOException e){}} //If it's not there to close, it's not there to worry about.
+                    try{fin=new FileInputStream(file);}catch(FileNotFoundException e){} //Already checked for and handled.
+                    write=false;
+                }
+                try{return (char)fin.read();}catch(IOException e){System.err.println("Unable to read character.");}
+            }else{System.err.println("Unable to read from file.");}
+            return '-';
+        }
+        public String readTo(char c){
+            String strout="";
+            char t;
+            
+            if(file.canRead()){
+                if(write){
+                    if(fout!=null){try{fout.close();}catch(IOException e){}} //If it's not there to close, it's not there to worry about.
+                    try{fin=new FileInputStream(file);}catch(FileNotFoundException e){} //Already checked for and handled.
+                    write=false;
+                }
+                try{
+                    do{
+                        t=(char)fin.read();
+                        if(t==c){return strout;}
+                        else if(t=='\n'){/* Do nothing / next */}
+                        else{strout+=t;}
+                    }while(true);
+                }catch(IOException e){System.err.println("Unable to read character after \""+strout+'"');}
+            }else{System.err.println("Unable to read from file.");}
+            return "";
+        }
+        
+        public void startWrite(){write=true;}
+        public boolean write(char c){
+            if(file.canWrite()){
+                if(!write){
+                    if(fin!=null){try{fin.close();}catch(IOException e){}} //If it's not there to close, it's not there to worry about.
+                    try{fout=new FileOutputStream(file);}catch(FileNotFoundException e){} //Already checked for and handled.
+                    write=true;
+                }
+                try{fout.write(c);return true;}catch(IOException e){System.err.println("Unable to write character.");}
+            }else{System.err.println("Unable to write to file.");}
+            return false;
+        }
+        public boolean write(String s){
+            boolean noError=true;
+            
+            for(int i=0;i<s.length();i++){if(!write(s.charAt(i))){noError=false;break;}}
+            return noError;
+        }
+        
+        public boolean isWriting(){return write;}
+        public void close(){
+            try{fin.close();}catch(IOException e){}
+            try{fout.close();}catch(IOException e){}
+        }
     }
 }

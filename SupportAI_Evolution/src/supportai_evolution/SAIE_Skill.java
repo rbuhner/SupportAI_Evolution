@@ -30,6 +30,7 @@ public class SAIE_Skill {
     public skillType getSkillType(){return stype;}
     public char getKey(){return key;}
     public int getCDLeft(){return cdLeft;}
+    public int getCD(){return cooldown;}
     
     /**
      * Function guarding use of the skill, will contain cooldowns, costs, etc. later.

@@ -9,11 +9,14 @@ package supportai_evolution;
  *  This is an evolving compilation of research and work to create a (hopefully) self-sufficient MMO Support AI, SAI-E
  *  (Stage 1) First Activation Loops: Theoretically finished 08/06/2017
  *  (Stage 2) EyesOpen~Smart Healing: Finished and tested 08/31/2017
- *  (Stage 3) HealAll~Self and Party: Theoretically finished 09/02/2017
+ *  (Stage 3) HealAll~Self and Party: Finished and tested 09/04/2017
+ *  (Stage 4) Profile Saving and Loading: Theoretically finished 09/04/2017
+ *          - Just broke 1,000 lines (1,004 lines at this stage.) -
  * @author Robert
  */
 
 import java.awt.AWTException;
+import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.Toolkit;
@@ -35,16 +38,15 @@ import java.util.logging.Level;
 public class SupportAI_Evolution {
     private static SupportAI_Evolution my;  //Need to make this non-static somehow, so that each run can target a new simulation with a new AI...
     private static GlobalKeyListener gkl;
-    private static String filePath="";
-    
-    //These will likely be temporary until profile saving/loading is implemented.
-    private ArrayList<String> savedArgs[]=new ArrayList[]{new ArrayList<>(),new ArrayList<>()};
-    private ArrayList<String> savedArgSelf=new ArrayList<>();
+    private static String filePath="",profileName="";
+    private static SAIE_Util.File file;
     
     protected boolean q;
     private final static boolean setup=false;
     private byte errorLevel;
+    private ArrayList<Boolean> optimize=new ArrayList<>();
     
+    private String currentGame;
     private SAIE_Skill skillBar[];
     private SAIE_Target currentTarget;
     private SAIE_Target self;
@@ -63,10 +65,8 @@ public class SupportAI_Evolution {
         //  until a later time when implementing more file-utils/error checking.
         for(int i=0;i<args.length;i++){
             System.out.print(args[i]+" : ");
-            if(args[i].equals("-fp")&&i+1<args.length){filePath=args[i+1];}                     //FilePath
-            else if(args[i].equals("-ts")&&i+1<args.length){my.savedArgSelf.add(args[i+1]);}         //Target (Self)
-            else if(args[i].equals("-tp")&&i+1<args.length){my.savedArgs[0].add(args[i+1]);}    //Target (Party)
-            else if(args[i].equals("-s")&&i+1<args.length){my.savedArgs[1].add(args[i+1]);}     //Skills(s)
+            if(args[i].equals("-fp")&&i+1<args.length){filePath=args[i+1];}     //FilePath
+            if(args[i].equals("-fn")&&i+1<args.length){profileName=args[i+1];}  //ProfileName
         }
         
         //Sleeping for 5 sec to switch over to simulation.
@@ -140,20 +140,39 @@ public class SupportAI_Evolution {
         logger.setUseParentHandlers(false);
         System.out.println("Native hook registered. Now listening for 'Esc'.");
         
-        /* Profile Loading */
-        //Looks like I'm doing basic profile loading a bit early this time.
-        my.SAIE_OpenEyes();
-        
-        //Only taking the first target for now, but will upgrade to full party with profile implementation.
-        if(!savedArgs[0].isEmpty()){
-            party=new SAIE_Target[1];
-            party[0]=initTarget(party[0],savedArgs[0]);
-        }else{
-            System.err.println("Target not provided. Please give a target on next run. Exiting...");
-            cleanExit(1);
+        try{Thread.sleep(500);}
+        catch(InterruptedException e){
+            System.out.println("Something interrupted thread sleep.");
+            my.errorLevel++;
         }
         
-        if(!savedArgs[1].isEmpty()){    //Just dealing with one skill at the moment, until profile loading is done. Would hate to input so many cmd'd...
+        /* Profile Loading */
+        if(file==null){
+            try{file = new SAIE_Util.File(filePath+profileName);}
+            catch(IOException e){
+                System.err.println("Unable to (al)locate file to load.");
+                cleanExit(1);
+            }
+        }
+        
+        //Load Profile from File
+        ArrayList<String> profile = loadProfile();
+        currentGame=profile.get(0);
+        
+        //Initializing Self_Target
+        SAIE_OpenEyes(profile.get(1));
+        
+        //Initializing Party Targets
+        if(profile.get(2).equals("")){
+            System.err.println("Target not provided. Please give a target on next run. Exiting...");
+            cleanExit(1);
+        }else{ //Only taking the first target for now, but will upgrade to full party with profile implementation.
+            party=new SAIE_Target[1];
+            party[0]=initTarget(party[0],profile.get(2),optimize.get(1));
+        }
+        
+        //Initializing SkillBar
+        if(!profile.get(3).isEmpty()){    //Just dealing with one skill at the moment, until profile loading is done. Would hate to input so many cmd'd...
             //String name,skillType sType,char key
             String temp="",name="",type="";
             char key='-';
@@ -161,17 +180,17 @@ public class SupportAI_Evolution {
             byte step=0;
             
             //name:type:key:cd:     ~any~:~any~:stringkey:#...#:
-            for(int i=0;i<savedArgs[1].get(0).length();i++){
-                if(savedArgs[1].get(0).charAt(i)==':'){
+            for(int i=0;i<profile.get(3).length();i++){
+                if(profile.get(3).charAt(i)==':'){
                     switch(step){
                         case 0: name=temp; break;
                         case 1: type=temp; break;
                         case 2: key=temp.charAt(0); break;
-                        case 3: cd=Integer.getInteger(temp);
+                        case 3: cd=Integer.parseInt(temp);
                     }
                     step++;
                     temp="";
-                }else{temp+=savedArgs[1].get(0).charAt(i);}
+                }else{temp+=profile.get(3).charAt(i);}
             }
             
             skillBar = new SAIE_Skill[]{
@@ -182,7 +201,71 @@ public class SupportAI_Evolution {
             cleanExit(1);
         }
     }
-    private SAIE_Target initTarget(SAIE_Target target,ArrayList<String> arg){
+    
+    private ArrayList<String> loadProfile(){
+        //Assuming conversion of above into file format, sans -fp of course.
+        //-tag:data:data2;
+        //Ex: -t:name:xyhpx:xyhpy:xyhpw:xyhph:chpn:chpr:chpg:chpb:||:chpDev:||;
+        //String read="",read2="";   //Used for diagnostic purposes.
+        ArrayList<String> args = new ArrayList<>();
+        boolean eof=false;  //End of File
+        
+        //Look for tags -gn = GameName, -ts = Target Self, -tp = Target Party, -s = Skill
+        do{
+            //Need to look into a more efficient way...
+            switch(file.readTo(':')){
+                case "-gn": System.out.println("Case -gn");
+                            args.add(file.readTo(';'));
+                            break;
+                case "-ts": System.out.println("Case -ts");
+                            optimize.add(file.readTo(':').equals('1'));
+                            args.add(file.readTo(';'));
+                            break;
+                case "-tp": System.out.println("Case -tp");
+                            optimize.add(file.readTo(':').equals('1'));
+                            args.add(file.readTo(';'));
+                            break;
+                case "-s":  System.out.println("Case -s");
+                            args.add(file.readTo(';'));
+                            break;
+                case ";":   System.out.println("Case ;");
+                            eof=true;
+                            break;
+                default:    System.err.println("Profile loading error.");
+            }
+        }while(!eof);
+        System.out.println("Profile loaded.");
+        
+        return args;
+    }
+    
+    private void SAIE_OpenEyes(String arg){   //Using OpenEyes as self-oriented visual initialization.
+        //--Run once for manual values
+        if(setup){
+            my.q=true;
+            try{
+                System.out.println("Capturing Screen...");
+                BufferedImage scap = SAIE_Util.r.createScreenCapture(new Rectangle(
+                        Toolkit.getDefaultToolkit().getScreenSize()));
+                File sfile = new File(filePath+"screencapInit.jpg");
+                ImageIO.write(scap,"jpg",sfile);
+                System.out.println("Screen captured and saved at "+filePath+"screencapInit.jpg");
+                cleanExit(0);
+            }catch(IOException e){
+                System.out.println("Unable image to write to file. Exiting...");
+                cleanExit(1);
+            }
+        }
+        
+        if(arg.equals("")){
+            System.err.println("No info on self. Please give on self on next run. Exiting...");
+            cleanExit(1);
+        }else{
+            self=initTarget(self,arg,optimize.get(0));
+        }
+    }
+    
+    private SAIE_Target initTarget(SAIE_Target target,String arg,boolean opt){
         //String name,Rectangle xyhp,Color chp,int chpIDev
         String temp="",name="",key="";
         int xyhp[]=new int[4];
@@ -193,8 +276,8 @@ public class SupportAI_Evolution {
 
         //name:xyhpx:xyhpy:xyhpw:xyhph:chpn:chpr:chpg:chpb:||:chpDev:||:key:
         //~any~:####:####:####:####:#:###:###:###:||:###:||:~any~:
-        for(int i=0;i<arg.get(0).length();i++){
-            if(arg.get(0).charAt(i)==':'){
+        for(int i=0;i<arg.length();i++){
+            if(arg.charAt(i)==':'){
                 switch(step){
                     case 0:     name=temp; break;
 
@@ -221,51 +304,26 @@ public class SupportAI_Evolution {
                 }
                 step++;
                 temp="";
-            }else{temp+=arg.get(0).charAt(i);}
+            }else{temp+=arg.charAt(i);}
         }
 
         int cDev[]=new int[chpDev.size()];
         Iterator<Integer> it=chpDev.iterator();
         for(int i=0;i<cDev.length;i++){cDev[i]=it.next();}
-
+        
         try{target=new SAIE_Target(name,new Rectangle(xyhp[0],xyhp[1],xyhp[2],xyhp[3]),
-                SAIE_Util.IntArrayToColorArray(chp),cDev,key,true);}
+                SAIE_Util.IntArrayToColorArray(chp),cDev,key,opt);}
         catch(SAIE_Util.InvalidValueException e){cleanExit(1);}
         return target;
-    }
-    
-    private void SAIE_OpenEyes(){   //Using OpenEyes as self-oriented visual initialization.
-        //--Run once for manual values
-        if(setup){
-            my.q=true;
-            try{
-                System.out.println("Capturing Screen...");
-                BufferedImage scap = SAIE_Util.r.createScreenCapture(new Rectangle(
-                        Toolkit.getDefaultToolkit().getScreenSize()));
-                File sfile = new File(filePath+"screencapInit.jpg");
-                ImageIO.write(scap,"jpg",sfile);
-                System.out.println("Screen captured and saved at "+filePath+"screencapInit.jpg");
-                cleanExit(0);
-            }catch(IOException e){
-                System.out.println("Unable image to write to file. Exiting...");
-                cleanExit(1);
-            }
-        }
-        
-        if(savedArgSelf.equals("")){
-            System.err.println("No info on self. Please give on self on next run. Exiting...");
-            cleanExit(1);
-        }else{
-            self=initTarget(self,savedArgSelf);
-        }
     }
     
     /** Where SAI-E processes choices and skill usage. */
     private void SAIECore(){    //Probably will be broken up as reasoning logic gets over-large.
         /* (Stage 2) Starts to look at the target's hp before using the skill. */
         /* (Stage 3) Starts looking at self and party hp before using skill. */
+        /* (Stage 4) No real change here. */
         
-        float hptarget = 0.75F;
+        float hptarget = 0.8F;
         
         self.update();
         System.out.println("My hp is currently "+self.getHp()+"%.");
@@ -297,8 +355,48 @@ public class SupportAI_Evolution {
     }
     private void selectTarget(SAIE_Target target){
         //Currently assumes a single key at this time, will upgrade to multikey (like shift-key) later.
+        System.out.println('\''+target.getKey()+'\'');
         SAIE_Util.typeKey(SAIE_Util.KEYSTRINGS.valueOf(target.getKey()).code());
         currentTarget=target;
+    }
+    
+    private void saveProfile(){
+        if(file!=null){
+            
+                file.write("-gn:"+currentGame+";\n");
+                
+                //Saving Self
+                file.write("-ts:0:"+self.getName()+':'+
+                        self.getHpBox().x+':'+self.getHpBox().y+':'+self.getHpBox().width+':'+self.getHpBox().height+':'+
+                        self.getHpColor().length+':');
+                    for(Color c:self.getHpColor()){file.write(""+c.getRed()+':'+c.getGreen()+':'+c.getBlue()+':');}
+                    for(int i:self.getHpDev()){file.write(""+i+':');}
+                    file.write(self.getKey()+":;\n");
+                
+                //Saving each member of the Party
+                for(SAIE_Target t:party){
+                    file.write("-tp:0:"+t.getName()+':'+
+                            t.getHpBox().x+':'+t.getHpBox().y+':'+t.getHpBox().width+':'+t.getHpBox().height+':'+
+                            t.getHpColor().length+':');
+                        for(Color c:t.getHpColor()){file.write(""+c.getRed()+':'+c.getGreen()+':'+c.getBlue()+':');}
+                        for(int i:t.getHpDev()){file.write(""+i+':');}
+                        file.write(t.getKey()+":;\n");
+                }
+                
+                //Saving each Skill
+                for(SAIE_Skill s:skillBar){
+                    file.write("-s:"+s.getName()+':'+s.getSkillType().toString()+':'+s.getKey()+':'+s.getCD()+":;\n");
+                }
+                
+                //End-of-File
+                file.write(";:");
+            /*}catch(IOException e){
+                //Something went wrong writing profile to file.
+                System.err.println("Unable to save profile due to error in file-out stream.");
+                System.err.println("Please check the profile at "+file.path+" for possible errors.");
+                file.close();
+            }*/
+        }
     }
     
     private void cleanExit(int exitcode){
@@ -306,6 +404,12 @@ public class SupportAI_Evolution {
         System.out.println("Clearing native key hook post-program.");
         SupportAI_Evolution.gkl.deleteSelf();
         System.out.println("Native key hook has been cleared.");
+        
+        if(file!=null){
+            System.out.println("Saving profile to "+file.path+" .");
+            saveProfile();
+            System.out.println("Finished saving profile.");
+        }
         
         System.out.println("\nProgram has ended.\n");
         
