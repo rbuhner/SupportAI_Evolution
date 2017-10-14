@@ -34,10 +34,12 @@ import org.jnativehook.keyboard.NativeKeyEvent;
 import org.jnativehook.keyboard.NativeKeyListener;
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import org.jnativehook.mouse.NativeMouseEvent;
+import org.jnativehook.mouse.NativeMouseInputListener;
 
 public class SupportAI_Evolution {
     private static SupportAI_Evolution my;  //Need to make this non-static somehow, so that each run can target a new simulation with a new AI...
-    private static GlobalKeyListener gkl;
+    private static SAIE_InputInterface sii;
     private static String filePath="",profileName="";
     private static SAIE_Util.File file;
     
@@ -130,9 +132,10 @@ public class SupportAI_Evolution {
             
             System.exit(1);
         }
-        gkl=new GlobalKeyListener();
-        GlobalScreen.addNativeKeyListener(gkl);
-        gkl.initMe(my);
+        sii=new SAIE_InputInterface();
+        GlobalScreen.addNativeKeyListener(sii.gkl);
+        GlobalScreen.addNativeMouseListener(sii.gml);
+        sii.initMe(my);
         //Getting the logger for "org.jnativehook" and setting the output to off,
         //  so that I can do it myself.
         Logger logger=Logger.getLogger(GlobalScreen.class.getPackage().getName());
@@ -402,7 +405,7 @@ public class SupportAI_Evolution {
     private void cleanExit(int exitcode){
         //Cleaning up keyboard hook.
         System.out.println("Clearing native key hook post-program.");
-        SupportAI_Evolution.gkl.deleteSelf();
+        SupportAI_Evolution.sii.deleteSelf();
         System.out.println("Native key hook has been cleared.");
         
         if(file!=null){
@@ -421,11 +424,61 @@ public class SupportAI_Evolution {
  *  SAI-E's interface with the jnativehook system.
  *  Thanks to Alex Barker for creating the kwhat/jnativehook system.
  */
-class GlobalKeyListener implements NativeKeyListener{
-    private SupportAI_Evolution me;
+class SAIE_InputInterface{
+    private SupportAI_Evolution my;
     
-    public void initMe(SupportAI_Evolution me){this.me=me;}
-    public void deleteSelf(){unregisterSelf();GlobalScreen.removeNativeKeyListener(this);}
+    class GlobalKeyListener implements NativeKeyListener{
+        @Override
+        public void nativeKeyPressed(NativeKeyEvent e){
+            System.out.println("Key Pressed: "+NativeKeyEvent.getKeyText(e.getKeyCode()));
+
+            if (e.getKeyCode()==NativeKeyEvent.VC_ESCAPE){
+                my.q=true;
+                unregisterSelf();
+            }
+        }
+        @Override
+        public void nativeKeyReleased(NativeKeyEvent e){System.out.println("Key Released: "+NativeKeyEvent.getKeyText(e.getKeyCode()));}
+        @Override
+        public void nativeKeyTyped(NativeKeyEvent e){System.out.println("Key Typed: "+NativeKeyEvent.getKeyText(e.getKeyCode()));}   
+    }
+    GlobalKeyListener gkl;
+    
+    class GlobalMouseListener implements NativeMouseInputListener{
+        @Override
+        public void nativeMouseClicked(NativeMouseEvent e) {
+            //System.out.println("Mouse Clicked: " + e.getClickCount());
+	}
+        @Override
+	public void nativeMousePressed(NativeMouseEvent e) {
+            //System.out.println("Mouse Pressed: " + e.getButton());
+	}
+        @Override
+	public void nativeMouseReleased(NativeMouseEvent e) {
+            //System.out.println("Mouse Released: " + e.getButton());
+	}
+        @Override
+	public void nativeMouseMoved(NativeMouseEvent e) {
+            System.out.println("Mouse Moved: " + e.getX() + ", " + e.getY());
+	}
+        @Override
+	public void nativeMouseDragged(NativeMouseEvent e) {
+            System.out.println("Mouse Dragged: " + e.getX() + ", " + e.getY());
+	}
+    }
+    GlobalMouseListener gml;
+    
+    public SAIE_InputInterface(){
+        gkl = new GlobalKeyListener();
+        gml = new GlobalMouseListener();
+    }
+    
+    public void initMe(SupportAI_Evolution me){this.my=me;}
+    public void deleteSelf(){
+        unregisterSelf();
+        GlobalScreen.removeNativeKeyListener(gkl);
+        GlobalScreen.removeNativeMouseListener(gml);
+    }
     public boolean GSIsRegistered(){return GlobalScreen.isNativeHookRegistered();}
     public void unregisterSelf(){
         try{GlobalScreen.unregisterNativeHook();}
@@ -452,18 +505,4 @@ class GlobalKeyListener implements NativeKeyListener{
             }
         }
     }
-    
-    @Override
-    public void nativeKeyPressed(NativeKeyEvent e){
-        System.out.println("Key Pressed: "+NativeKeyEvent.getKeyText(e.getKeyCode()));
-        
-        if (e.getKeyCode()==NativeKeyEvent.VC_ESCAPE){
-            me.q=true;
-            unregisterSelf();
-        }
-    }
-    @Override
-    public void nativeKeyReleased(NativeKeyEvent e){System.out.println("Key Released: "+NativeKeyEvent.getKeyText(e.getKeyCode()));}
-    @Override
-    public void nativeKeyTyped(NativeKeyEvent e){System.out.println("Key Typed: "+NativeKeyEvent.getKeyText(e.getKeyCode()));}
 }
