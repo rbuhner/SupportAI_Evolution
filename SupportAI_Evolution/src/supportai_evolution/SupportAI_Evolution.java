@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 //For the global keyboard listening. All this to capture a 'Esc' press to quit...
+/* NOTE: If we're bringing in this overhead, might as well capture more than esc out-focus. */
+/* NOTE2: Need to find a way to create multiple points of focus/listeners/sysinputs... */
 import org.jnativehook.GlobalScreen;
 import org.jnativehook.NativeHookException;
 import org.jnativehook.keyboard.NativeKeyEvent;
@@ -37,16 +39,19 @@ import java.util.logging.Level;
 
 public class SupportAI_Evolution {
     private static SupportAI_Evolution my;  //Need to make this non-static somehow, so that each run can target a new simulation with a new AI...
+        /* NOTE: One way to make this non-static is to wrap SAIE in a static manager/scheduler,
+                to interface between the static main method and each SAIE sim.*/
     private static GlobalKeyListener gkl;
     private static String filePath="",profileName="";
     private static SAIE_Util.File file;
     
-    protected boolean q;
+    protected boolean q;    /* NOTE: Protected? So any class in the package can force a quit? */
     private final static boolean setup=false;
     private byte errorLevel;
     private ArrayList<Boolean> optimize=new ArrayList<>();
     
     private String currentGame;
+    /* NOTE: In-Game data could be switched over to neural memory? */
     private SAIE_Skill skillBar[];
     private SAIE_Target currentTarget;
     private SAIE_Target self;
@@ -59,10 +64,12 @@ public class SupportAI_Evolution {
         my=new SupportAI_Evolution();
         
         my.q=false;   //Turn to false when ready to run more than one loop.
+            /* NOTE: this would cause quiting after init now, need to redo. */
         my.errorLevel=0;
         
         //This is currently going to assume that the filepath/skill(s)/target(s) given is a valid one,
         //  until a later time when implementing more file-utils/error checking.
+        /* NOTE: With resource-try and exceptions no assumptions required. */
         for(int i=0;i<args.length;i++){
             System.out.print(args[i]+" : ");
             if(args[i].equals("-fp")&&i+1<args.length){filePath=args[i+1];}     //FilePath
@@ -70,6 +77,8 @@ public class SupportAI_Evolution {
         }
         
         //Sleeping for 5 sec to switch over to simulation.
+        /* NOTE: Why not have a keypress/etc in once simulation is ready in case loading times,
+                would make it possible for a pause/restart if needing to reload sim w/o re-running AI.*/
         try{Thread.sleep(5000);}
         catch(InterruptedException e){
             System.out.println("Something interrupted thread sleep.");
@@ -77,12 +86,14 @@ public class SupportAI_Evolution {
         }
         
         my.SAIE_Initialize();
+        /* NOTE: Instead of qtest after init, just have init throw an exception, which gives better messageing anyways. */
         if(my.q==true){
             System.out.println("Need to terminate from init(). Exiting...");
             my.cleanExit(1);
         }
         
         //Attempting to time AI process loop to once every second first.
+        /* NOTE: With system clocking one could actually time the loop to the clock, so as not needing hand-tuning. */
         int temp=120;
         System.out.println("I'm starting to do things! ~"+temp/2+"seconds available.");
         do{
@@ -106,9 +117,11 @@ public class SupportAI_Evolution {
         my.cleanExit(0);
     }
     
+    /* NOTE: If having init(), this will need to throw exceptions. */
     private void SAIE_Initialize(){
         //Defines AI's 'robot' (human image computer interface)
         System.out.println("Creating Robot...");
+        /* NOTE: Since we have a SAIE clean-up function, may want to route all system.exit()s through there. */
         try{SAIE_Util.r=new Robot();}
         catch(AWTException e){
             System.out.println("No low-level input control. Exiting...");
