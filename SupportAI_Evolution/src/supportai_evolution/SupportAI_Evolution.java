@@ -15,6 +15,9 @@ package supportai_evolution;
  * @author Robert
  */
 
+/* Making notes to redo project to work better/
+    be stuctured in a way to better work with the snatches of time to work on it. */
+
 import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Rectangle;
